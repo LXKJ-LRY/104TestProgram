@@ -44,3 +44,4 @@
 build/
 CMakeLists.txt.*
 exe*
+libiec60870/

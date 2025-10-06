@@ -9,10 +9,14 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql)
 
 set(TS_FILES testProgram_zh_CN.ts)
+
+set(Libiec60870Path ${CMAKE_CURRENT_SOURCE_DIR}/libiec60870)
+include_directories(${Libiec60870Path}/include)
+link_directories(${Libiec60870Path}/lib)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -45,6 +49,7 @@ else()
 
         add_executable(testProgram
             ${PROJECT_SOURCES}
+            dbdatahandler.h dbdatahandler.cpp
 
 
         )
@@ -80,3 +85,4 @@ install(TARGETS testProgram
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(testProgram)
 endif()
+
