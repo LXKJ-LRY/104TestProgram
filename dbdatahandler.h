@@ -3,20 +3,34 @@
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSqlError>
+#include <QStringList>
 
-class DBDataHandler
+class DBDataHandler : public QObject
 {
+    Q_OBJECT
 public:
-    DBDataHandler* instance();
+    static DBDataHandler* instance();
+
+    static void release();
+
+    void addNewSettingToDB();
+    void onRefreshSettingComboBox(QList<QString>& settingsNameList);
 
 private:
     DBDataHandler();
-    DBDataHandler(const DBDataHandler& );
+    DBDataHandler(const DBDataHandler& ){}
     ~DBDataHandler();
 
     static DBDataHandler* _instance;
     QSqlDatabase dataBase;
     QSqlQuery query;
+    QString sql;
+
 };
 
 #endif // DBDATAHANDLER_H
