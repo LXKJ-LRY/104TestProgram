@@ -92,4 +92,28 @@ void MainWindow::onSettingComboBoxchanged(int index)
 {
     qDebug() << "index : " << index;
     settingComboCurrentIndex = index;
+    QString singleSettingName = ui->settingComboBox->currentText();
+    static QList<QString> singleSettingInfo;
+    _dbDataHandler->querySingleSettingInfo(singleSettingName, singleSettingInfo);
+
+    if (singleSettingInfo.size() >= 5)
+    {
+        ui->nameEdit->setText(singleSettingInfo[0]);
+        ui->localMasterAddrEdit->setText(singleSettingInfo[1]);
+        ui->localMasterPortEdit->setText(singleSettingInfo[2]);
+        ui->remoteSlaveAddrEdit->setText(singleSettingInfo[3]);
+        ui->remoteSlavePortEdit->setText(singleSettingInfo[4]);
+    }
+    else
+    {
+        ui->localMasterAddrEdit->clear();
+        ui->localMasterPortEdit->clear();
+        ui->remoteSlaveAddrEdit->clear();
+        ui->remoteSlavePortEdit->clear();
+        qDebug() << "配置查询结果不足 4 个字段，已清空输入框";
+    }
+
+    singleSettingName.clear();
+    singleSettingInfo.clear();
+
 }

@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "dbdatahandler.h"
-#include "settingmanager.h"
+#include "settingManager/settingmanager.h"
 
 #include <QMainWindow>
 #include <QSettings>

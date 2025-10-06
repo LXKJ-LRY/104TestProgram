@@ -2,16 +2,17 @@
 
 DBDataHandler* DBDataHandler::_instance = new DBDataHandler;
 
-DBDataHandler::DBDataHandler()
+DBDataHandler::DBDataHandler(QObject *parent)
+    : QObject{parent}
 {
     dataBase = QSqlDatabase::addDatabase("QSQLITE");
     dataBase.setDatabaseName("TestProgram.sqlite");
     qDebug() << (bool)dataBase.open();
 
     query = (QSqlQuery)dataBase;
-    sql = "create table if not exists t_ConnectionSettings (SettingID int primary key, "
-                  "SettingName text not NULL, LocalMasterAddr varchar(15), LocalPort int,"
-                  " RemoteSlaveAddr varchar(15), RemotePort int);";
+    sql = "create table if not exists t_ConnectionSettings (SettingID integer primary key autoincrement, "
+          "SettingName text not NULL, LocalMasterAddr varchar(15), LocalPort integer,"
+          " RemoteSlaveAddr varchar(15), RemotePort integer);";
     qDebug() << "创建104连接设置表：" << (bool)query.exec(sql);
     sql.clear();
 
@@ -21,7 +22,7 @@ DBDataHandler::DBDataHandler()
     sql.clear();
 
     sql = "create table if not exists t_Devices "
-          "(DeviceNO int primary key, DeviceName text, Address int, YXpoint int, YKpoint int);";
+          "(DeviceNO integer primary key autoincrement, DeviceName text, Address integer, YXpoint integer, YKpoint integer);";
     qDebug() << "创建设备表：" << (bool)query.exec(sql);
     sql.clear();
 
@@ -103,7 +104,8 @@ void DBDataHandler::addNewSettingToDB()
         newName = baseName + QString::number(maxNum + 1);
     }
 
-    query.prepare("INSERT INTO t_ConnectionSettings (SettingName) VALUES (:name);");
+    query.prepare("INSERT INTO t_ConnectionSettings (SettingName, LocalMasterAddr, LocalPort, RemoteSlaveAddr, RemotePort)"
+                  " VALUES (:name, '0.0.0.0', '0', '0.0.0.0', '0');");
     query.bindValue(":name", newName);
 
     if (query.exec())
@@ -123,6 +125,7 @@ void DBDataHandler::onRefreshSettingComboBox(QList<QString>& settingsNameList)
     if(!query.exec(sql))
     {
         qDebug() << "查询已有设置名称失败";
+        sql.clear();
         return;
     }
     while(query.next())
@@ -131,3 +134,32 @@ void DBDataHandler::onRefreshSettingComboBox(QList<QString>& settingsNameList)
     }
     sql.clear();
 }
+
+void DBDataHandler::querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo)
+{
+    sql.clear();
+    sql = "select * from t_ConnectionSettings where SettingName==:singleSettingName;";
+    query.prepare(sql);
+    query.bindValue(":singleSettingName", settingName);
+    if(!query.exec())
+    {
+        qDebug() << "查询失败";
+        sql.clear();
+        return;
+    }
+
+    if(query.next())
+    {
+        singleSettingInfo.append(query.value(ConnectionSettingsColum::SettingName).toString());
+        singleSettingInfo.append(query.value(ConnectionSettingsColum::LocalMasterAddr).toString());
+        singleSettingInfo.append(query.value(ConnectionSettingsColum::LocalPort).toString());
+        singleSettingInfo.append(query.value(ConnectionSettingsColum::RemoteSlaveAddr).toString());
+        singleSettingInfo.append(query.value(ConnectionSettingsColum::Remoteport).toString());
+    }
+    else
+    {
+        qDebug() << "未找到相关的配置记录";
+    }
+    sql.clear();
+}
+

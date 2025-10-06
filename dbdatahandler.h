@@ -13,6 +13,17 @@
 class DBDataHandler : public QObject
 {
     Q_OBJECT
+
+    enum ConnectionSettingsColum
+    {
+        SettingID = 0,
+        SettingName,
+        LocalMasterAddr,
+        LocalPort,
+        RemoteSlaveAddr,
+        Remoteport
+    };
+
 public:
     static DBDataHandler* instance();
 
@@ -20,9 +31,10 @@ public:
 
     void addNewSettingToDB();
     void onRefreshSettingComboBox(QList<QString>& settingsNameList);
+    void querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo);
 
 private:
-    DBDataHandler();
+    DBDataHandler(QObject *parent = nullptr);
     DBDataHandler(const DBDataHandler& ){}
     ~DBDataHandler();
 
