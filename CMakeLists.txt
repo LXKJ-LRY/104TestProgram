@@ -9,8 +9,8 @@ set(CMAKE_PREFIX_PATH "D:/Qt/5.15.2/msvc2019_64/lib/cmake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql Network)
 
 set(TS_FILES testProgram_zh_CN.ts)
 
@@ -71,6 +71,7 @@ target_link_libraries(testProgram PRIVATE Qt5::Sql)
 target_link_libraries(testProgram PRIVATE Qt5::Core)
 target_link_libraries(testProgram PRIVATE Qt5::Core)
 target_link_libraries(testProgram PRIVATE Qt5::Core)
+target_link_libraries(testProgram PRIVATE lib60870)
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.

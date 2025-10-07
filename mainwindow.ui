@@ -195,7 +195,7 @@
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QLineEdit" name="localMasterPortEdit">
+         <widget class="QLineEdit" name="localPortEdit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -250,7 +250,7 @@
          </spacer>
         </item>
         <item row="6" column="1">
-         <widget class="QLineEdit" name="remoteSlavePortEdit">
+         <widget class="QLineEdit" name="remotePortEdit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>

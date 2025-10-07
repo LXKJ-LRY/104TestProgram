@@ -7,28 +7,21 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
-    ui->testPageButton->setEnabled(false);
 
-    _dbThread = new QThread(this);
-    _dbDataHandler = DBDataHandler::instance();
-    _dbDataHandler->moveToThread(_dbThread);
-    _dbThread->start();
+    initialize();
 
     setupConnections();
 
     RefreshSettingComboBox();
-
-    _setting = new QSettings(QApplication::applicationDirPath() + "/ConnectionSetting.ini", QSettings::Format::IniFormat, this);
-    _setting->setValue("/ConnectionSetting/SettingName","新的配置");
-    _setting->setValue("/ConnectionSetting/LocalMasterAddr","127.0.0.1");
-    _setting->setValue("/ConnectionSetting/LocalPort","2404");
-    _setting->setValue("/ConnectionSetting/RemoteSlaveAddr","127.0.0.1");
-    _setting->setValue("/ConnectionSetting/RemotePort","2404");
 }
 
 MainWindow::~MainWindow()
 {
+    if (_104Thread != nullptr)
+    {
+        _104Thread->quit();
+        _104Thread->wait();
+    }
     if (_dbThread != nullptr)
     {
         _dbThread->quit();
@@ -36,6 +29,30 @@ MainWindow::~MainWindow()
     }
     _dbDataHandler->release();
     delete ui;
+}
+
+void MainWindow::initialize()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+    ui->testPageButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(false);
+
+    _104Thread = new QThread(this);
+    _104controller = new Iec104Controller(this);
+    _104controller->moveToThread(_104Thread);
+    _104Thread->start();
+
+    _dbThread = new QThread(this);
+    _dbDataHandler = DBDataHandler::instance();
+    _dbDataHandler->moveToThread(_dbThread);
+    _dbThread->start();
+
+    _setting = new QSettings(QApplication::applicationDirPath() + "/ConnectionSetting.ini", QSettings::Format::IniFormat, this);
+    _setting->setValue("/ConnectionSetting/SettingName","新的配置");
+    _setting->setValue("/ConnectionSetting/LocalMasterAddr","127.0.0.1");
+    _setting->setValue("/ConnectionSetting/LocalPort","2404");
+    _setting->setValue("/ConnectionSetting/RemoteSlaveAddr","127.0.0.1");
+    _setting->setValue("/ConnectionSetting/RemotePort","2404");
 }
 
 void MainWindow::setupConnections()
@@ -59,6 +76,9 @@ void MainWindow::setupConnections()
 
     connect(this, &MainWindow::refreshComboBoxFromDB, _dbDataHandler, &DBDataHandler::onRefreshSettingComboBox, Qt::QueuedConnection);
     connect(_dbDataHandler, &DBDataHandler::querySettingsNameFinished, this, &MainWindow::onQuerySettingsNameFinished, Qt::QueuedConnection);
+
+    connect(ui->connectButton, &QAbstractButton::clicked, this, &MainWindow::onConnectButtonClicked);
+    connect(ui->disconnectButton, &QAbstractButton::clicked, this, &MainWindow::onDisconnectButtonClicked);
 }
 
 
@@ -129,16 +149,16 @@ void MainWindow::onSettingComboBoxchanged(int index)
     {
         ui->nameEdit->setText(singleSettingInfo[0]);
         ui->localMasterAddrEdit->setText(singleSettingInfo[1]);
-        ui->localMasterPortEdit->setText(singleSettingInfo[2]);
+        ui->localPortEdit->setText(singleSettingInfo[2]);
         ui->remoteSlaveAddrEdit->setText(singleSettingInfo[3]);
-        ui->remoteSlavePortEdit->setText(singleSettingInfo[4]);
+        ui->remotePortEdit->setText(singleSettingInfo[4]);
     }
     else
     {
         ui->localMasterAddrEdit->clear();
-        ui->localMasterPortEdit->clear();
+        ui->localPortEdit->clear();
         ui->remoteSlaveAddrEdit->clear();
-        ui->remoteSlavePortEdit->clear();
+        ui->remotePortEdit->clear();
         qDebug() << "配置查询结果不足 4 个字段，已清空输入框";
     }
 
@@ -172,9 +192,9 @@ void MainWindow::onSaveSettingButtonClicked()
     singleSettinginfo.append(ui->settingComboBox->currentText());
     singleSettinginfo.append(ui->nameEdit->text());
     singleSettinginfo.append(ui->localMasterAddrEdit->text());
-    singleSettinginfo.append(ui->localMasterPortEdit->text());
+    singleSettinginfo.append(ui->localPortEdit->text());
     singleSettinginfo.append(ui->remoteSlaveAddrEdit->text());
-    singleSettinginfo.append(ui->remoteSlavePortEdit->text());
+    singleSettinginfo.append(ui->remotePortEdit->text());
     emit saveSettingToDB(singleSettinginfo);
 
 
@@ -202,3 +222,36 @@ void MainWindow::onQuerySettingsNameFinished(QList<QString> settingsNameList)
     qDebug() << "刷新 settingComboBox 成功";
     settingsNameList.clear();
 }
+
+void MainWindow::onConnectButtonClicked()
+{
+    ui->connectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(true);
+    ui->settingComboBox->setEnabled(false);
+    ui->nameEdit->setEnabled(false);
+    ui->localMasterAddrEdit->setEnabled(false);
+    ui->localPortEdit->setEnabled(false);
+    ui->remoteSlaveAddrEdit->setEnabled(false);
+    ui->remotePortEdit->setEnabled(false);
+    ui->newSettingButton->setEnabled(false);
+    ui->deleteSettingButton->setEnabled(false);
+    ui->saveSettingButton->setEnabled(false);
+
+}
+
+void MainWindow::onDisconnectButtonClicked()
+{
+    ui->connectButton->setEnabled(true);
+    ui->disconnectButton->setEnabled(false);
+    ui->settingComboBox->setEnabled(true);
+    ui->nameEdit->setEnabled(true);
+    ui->localMasterAddrEdit->setEnabled(true);
+    ui->localPortEdit->setEnabled(true);
+    ui->remoteSlaveAddrEdit->setEnabled(true);
+    ui->remotePortEdit->setEnabled(true);
+    ui->newSettingButton->setEnabled(true);
+    ui->deleteSettingButton->setEnabled(true);
+    ui->saveSettingButton->setEnabled(true);
+}
+
+

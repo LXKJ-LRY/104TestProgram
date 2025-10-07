@@ -3,6 +3,7 @@
 
 #include "dbdatahandler.h"
 #include "settingManager/settingmanager.h"
+#include "iec104controller.h"
 
 #include <QMainWindow>
 #include <QSettings>
@@ -60,8 +61,11 @@ private slots:
 
     void onQuerySettingsNameFinished(const QList<QString> settingsNameList);
 
+    void onConnectButtonClicked();
+    void onDisconnectButtonClicked();
 
 private:
+    void initialize();
     void RefreshSettingComboBox();
 
     Ui::MainWindow *ui;
@@ -71,6 +75,9 @@ private:
 
     DBDataHandler* _dbDataHandler = nullptr;
     QThread* _dbThread = nullptr;
+
+    Iec104Controller* _104controller;
+    QThread* _104Thread;
 
     int settingComboCurrentIndex = 0;
     int settingComboLastIndex = -1;
