@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QDialog>
 #include <QThread>
+#include <QMessageBox>
 
 
 QT_BEGIN_NAMESPACE
@@ -35,17 +36,30 @@ public:
     void setupConnections();
 
 signals:
-    void refreshSettingComboBox();
+    void refreshComboBoxFromDB(QList<QString> settingsNameList);
+    void addNewSettingToDB();
+    void saveSettingToDB();
+    void deleteSettingFromDB();
+
 
 private slots:
     void onSettingPageButtonClicked();
     void onTestPageButtonClicked();
     void onDeviceListButtonClicked();
-    void onNewSettingButtonClicked();
-    void onRefreshSettingComboBox();
+
     void onSettingComboBoxchanged(int index);
 
+    void onNewSettingButtonClicked();
+    void onAddNewSettingToDBFinished();
+
+    void onDeleteSettingButtonClicked();
+    void onSaveSettingButtonClicked();
+    void onQuerySettingsNameFinished(QList<QString> settingsNameList);
+
+
 private:
+    void RefreshSettingComboBox();
+
     Ui::MainWindow *ui;
     QSettings* _setting;
 
@@ -53,6 +67,8 @@ private:
 
     DBDataHandler* _dbDataHandler = nullptr;
     QThread* _dbThread = nullptr;
+
+    QList<QString> settingsNameList;
 
     int settingComboCurrentIndex = 0;
     int settingComboLastIndex = -1;

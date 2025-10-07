@@ -49,6 +49,7 @@ void DBDataHandler::release()
 
 void DBDataHandler::addNewSettingToDB()
 {
+    qDebug() << "hello3";
     static QString baseName = "新的配置";
 
     sql = "SELECT SettingName FROM t_ConnectionSettings WHERE SettingName LIKE :baseName;";
@@ -118,7 +119,7 @@ void DBDataHandler::addNewSettingToDB()
     }
 }
 
-void DBDataHandler::onRefreshSettingComboBox(QList<QString>& settingsNameList)
+void DBDataHandler::onRefreshSettingComboBox(QList<QString> settingsNameList)
 {
     sql.clear();
     sql = "select SettingName from t_ConnectionSettings";
@@ -133,6 +134,7 @@ void DBDataHandler::onRefreshSettingComboBox(QList<QString>& settingsNameList)
         settingsNameList.append(query.value("SettingName").toString());
     }
     sql.clear();
+    emit querySettingsNameFinished(settingsNameList);
 }
 
 void DBDataHandler::querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo)
@@ -161,5 +163,12 @@ void DBDataHandler::querySingleSettingInfo(QString& settingName, QList<QString>&
         qDebug() << "未找到相关的配置记录";
     }
     sql.clear();
+}
+
+void DBDataHandler::onAddNewSettingToDB()
+{
+    qDebug() << "hello2";
+    addNewSettingToDB();
+    emit addNewSettingToDBFinished();
 }
 

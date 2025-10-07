@@ -30,8 +30,15 @@ public:
     static void release();
 
     void addNewSettingToDB();
-    void onRefreshSettingComboBox(QList<QString>& settingsNameList);
+    void onRefreshSettingComboBox(QList<QString> settingsNameList);
     void querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo);
+
+signals:
+    void addNewSettingToDBFinished();
+    void querySettingsNameFinished(QList<QString> settingsNameList);
+
+public slots:
+    void onAddNewSettingToDB();
 
 private:
     DBDataHandler(QObject *parent = nullptr);

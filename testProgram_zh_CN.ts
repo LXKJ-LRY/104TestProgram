@@ -99,5 +99,16 @@
         <source>配置名称：</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="mainwindow.cpp" line="173"/>
+        <source>dont have config</source>
+        <oldsource>don&apos;t have config</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="173"/>
+        <source>no settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

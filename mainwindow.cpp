@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "memory"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -8,23 +9,31 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     ui->testPageButton->setEnabled(false);
-    setupConnections();
 
     _dbThread = new QThread(this);
     _dbDataHandler = DBDataHandler::instance();
     _dbDataHandler->moveToThread(_dbThread);
-    emit refreshSettingComboBox();
+    _dbThread->start();
+
+    setupConnections();
+
+    RefreshSettingComboBox();
 
     _setting = new QSettings(QApplication::applicationDirPath() + "/ConnectionSetting.ini", QSettings::Format::IniFormat, this);
-    _setting->setValue("/ConnectionSetting/SettingName","配置");
-    _setting->setValue("/ConnectionSetting/LocalMasterAddr","0.0.0.0");
+    _setting->setValue("/ConnectionSetting/SettingName","新的配置");
+    _setting->setValue("/ConnectionSetting/LocalMasterAddr","127.0.0.1");
     _setting->setValue("/ConnectionSetting/LocalPort","2404");
-    _setting->setValue("/ConnectionSetting/RemoteSlaveAddr","0.0.0.0");
+    _setting->setValue("/ConnectionSetting/RemoteSlaveAddr","127.0.0.1");
     _setting->setValue("/ConnectionSetting/RemotePort","2404");
 }
 
 MainWindow::~MainWindow()
 {
+    if (_dbThread != nullptr)
+    {
+        _dbThread->quit();
+        _dbThread->wait();
+    }
     _dbDataHandler->release();
     delete ui;
 }
@@ -34,9 +43,17 @@ void MainWindow::setupConnections()
     connect(ui->testPageButton, &QAbstractButton::clicked, this, &MainWindow::onTestPageButtonClicked);
     connect(ui->settingPageButton, &QAbstractButton::clicked, this, &MainWindow::onSettingPageButtonClicked);
     connect(ui->deviceListButton, &QAbstractButton::clicked, this, &MainWindow::onDeviceListButtonClicked);
-    connect(ui->newSettingButton, &QAbstractButton::clicked, this, &MainWindow::onNewSettingButtonClicked);
-    connect(this, &MainWindow::refreshSettingComboBox, this, &MainWindow::onRefreshSettingComboBox);
     connect(ui->settingComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &MainWindow::onSettingComboBoxchanged);
+
+    connect(ui->newSettingButton, &QAbstractButton::clicked, this, &MainWindow::onNewSettingButtonClicked);
+    connect(this, &MainWindow::addNewSettingToDB, _dbDataHandler, &DBDataHandler::onAddNewSettingToDB, Qt::QueuedConnection);
+    connect(_dbDataHandler, &DBDataHandler::addNewSettingToDBFinished, this, &MainWindow::onAddNewSettingToDBFinished, Qt::QueuedConnection);
+
+    connect(ui->deleteSettingButton, &QAbstractButton::clicked, this, &MainWindow::onDeleteSettingButtonClicked);
+    connect(ui->saveSettingButton, &QAbstractButton::clicked, this, &MainWindow::onSaveSettingButtonClicked);
+
+    connect(this, &MainWindow::refreshComboBoxFromDB, _dbDataHandler, &DBDataHandler::onRefreshSettingComboBox, Qt::QueuedConnection);
+    connect(_dbDataHandler, &DBDataHandler::querySettingsNameFinished, this, &MainWindow::onQuerySettingsNameFinished, Qt::QueuedConnection);
 }
 
 
@@ -58,38 +75,45 @@ void MainWindow::onTestPageButtonClicked()
 
 void MainWindow::onDeviceListButtonClicked()
 {
-    auto dialog = new QDialog(this);
+    std::unique_ptr<QDialog> dialog(new QDialog(this));
     dialog->setMinimumSize(800, 600);
-    dialog->show();
+    dialog->exec();
 }
 
 void MainWindow::onNewSettingButtonClicked()
 {
     ui->newSettingButton->setEnabled(false);
-    _dbDataHandler->addNewSettingToDB();
-    emit refreshSettingComboBox();
-    ui->newSettingButton->setEnabled(true);
+    ui->saveSettingButton->setEnabled(false);
+    ui->deleteSettingButton->setEnabled(false);
+    qDebug() << "hello1";
+    emit addNewSettingToDB();
+
 }
 
-void MainWindow::onRefreshSettingComboBox()
+void MainWindow::onAddNewSettingToDBFinished()
+{
+    qDebug() << "hello4";
+    RefreshSettingComboBox();
+    ui->newSettingButton->setEnabled(true);
+    ui->saveSettingButton->setEnabled(true);
+    ui->deleteSettingButton->setEnabled(true);
+}
+
+void MainWindow::RefreshSettingComboBox()
 {
     ui->settingComboBox->clear();
-    QList<QString> settingsNameList;
-    _dbDataHandler->onRefreshSettingComboBox(settingsNameList);
-    if(settingsNameList.isEmpty())
-    {
-        qDebug() << "暂无相关配置";
-        return;
-    }
-    for(auto settingName : settingsNameList)
-    {
-        ui->settingComboBox->addItem(settingName);
-    }
-    qDebug() << "刷新 settingComboBox 成功";
+    emit refreshComboBoxFromDB(settingsNameList);
 }
+
+
 
 void MainWindow::onSettingComboBoxchanged(int index)
 {
+    if(index == -1)
+    {
+        qDebug() << " 刷新 settingCombo 时的清空阶段,index = -1，跳过此 onSettingComboBoxchanged ";
+        return;
+    }
     qDebug() << "index : " << index;
     settingComboCurrentIndex = index;
     QString singleSettingName = ui->settingComboBox->currentText();
@@ -116,4 +140,43 @@ void MainWindow::onSettingComboBoxchanged(int index)
     singleSettingName.clear();
     singleSettingInfo.clear();
 
+}
+
+void MainWindow::onDeleteSettingButtonClicked()
+{
+    ui->newSettingButton->setEnabled(false);
+    ui->saveSettingButton->setEnabled(false);
+    ui->deleteSettingButton->setEnabled(false);
+
+    RefreshSettingComboBox();
+    ui->newSettingButton->setEnabled(true);
+    ui->saveSettingButton->setEnabled(true);
+    ui->deleteSettingButton->setEnabled(true);
+}
+
+void MainWindow::onSaveSettingButtonClicked()
+{
+    ui->newSettingButton->setEnabled(false);
+    ui->saveSettingButton->setEnabled(false);
+    ui->deleteSettingButton->setEnabled(false);
+
+    RefreshSettingComboBox();
+    ui->newSettingButton->setEnabled(true);
+    ui->saveSettingButton->setEnabled(true);
+    ui->deleteSettingButton->setEnabled(true);
+}
+
+void MainWindow::onQuerySettingsNameFinished(QList<QString> settingsNameList)
+{
+    if(settingsNameList.isEmpty())
+    {
+        QMessageBox::warning(this, tr("dont have config"), tr("no settings"));
+        return;
+    }
+    for(auto settingName : settingsNameList)
+    {
+        ui->settingComboBox->addItem(settingName);
+    }
+    qDebug() << "刷新 settingComboBox 成功";
+    settingsNameList.clear();
 }
