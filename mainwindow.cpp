@@ -50,7 +50,12 @@ void MainWindow::setupConnections()
     connect(_dbDataHandler, &DBDataHandler::addNewSettingToDBFinished, this, &MainWindow::onAddNewSettingToDBFinished, Qt::QueuedConnection);
 
     connect(ui->deleteSettingButton, &QAbstractButton::clicked, this, &MainWindow::onDeleteSettingButtonClicked);
+    connect(this, &MainWindow::deleteSettingFromDB, _dbDataHandler, &DBDataHandler::onDeleteSettingFromDB, Qt::QueuedConnection);
+    connect(_dbDataHandler, &DBDataHandler::deleteSettingFromDBFinished, this, &MainWindow::onDeleteSettingFromDBFinished, Qt::QueuedConnection);
+
     connect(ui->saveSettingButton, &QAbstractButton::clicked, this, &MainWindow::onSaveSettingButtonClicked);
+    connect(this, &MainWindow::saveSettingToDB, _dbDataHandler, &DBDataHandler::onSaveSettingToDB, Qt::QueuedConnection);
+    connect(_dbDataHandler, &DBDataHandler::saveSettingToDBFinished, this, &MainWindow::onSaveSettingToDBFinished, Qt::QueuedConnection);
 
     connect(this, &MainWindow::refreshComboBoxFromDB, _dbDataHandler, &DBDataHandler::onRefreshSettingComboBox, Qt::QueuedConnection);
     connect(_dbDataHandler, &DBDataHandler::querySettingsNameFinished, this, &MainWindow::onQuerySettingsNameFinished, Qt::QueuedConnection);
@@ -102,7 +107,7 @@ void MainWindow::onAddNewSettingToDBFinished()
 void MainWindow::RefreshSettingComboBox()
 {
     ui->settingComboBox->clear();
-    emit refreshComboBoxFromDB(settingsNameList);
+    emit refreshComboBoxFromDB();
 }
 
 
@@ -147,7 +152,11 @@ void MainWindow::onDeleteSettingButtonClicked()
     ui->newSettingButton->setEnabled(false);
     ui->saveSettingButton->setEnabled(false);
     ui->deleteSettingButton->setEnabled(false);
+    emit deleteSettingFromDB(ui->settingComboBox->currentText());
+}
 
+void MainWindow::onDeleteSettingFromDBFinished()
+{
     RefreshSettingComboBox();
     ui->newSettingButton->setEnabled(true);
     ui->saveSettingButton->setEnabled(true);
@@ -159,7 +168,20 @@ void MainWindow::onSaveSettingButtonClicked()
     ui->newSettingButton->setEnabled(false);
     ui->saveSettingButton->setEnabled(false);
     ui->deleteSettingButton->setEnabled(false);
+    QList<QString> singleSettinginfo;
+    singleSettinginfo.append(ui->settingComboBox->currentText());
+    singleSettinginfo.append(ui->nameEdit->text());
+    singleSettinginfo.append(ui->localMasterAddrEdit->text());
+    singleSettinginfo.append(ui->localMasterPortEdit->text());
+    singleSettinginfo.append(ui->remoteSlaveAddrEdit->text());
+    singleSettinginfo.append(ui->remoteSlavePortEdit->text());
+    emit saveSettingToDB(singleSettinginfo);
 
+
+}
+
+void MainWindow::onSaveSettingToDBFinished()
+{
     RefreshSettingComboBox();
     ui->newSettingButton->setEnabled(true);
     ui->saveSettingButton->setEnabled(true);

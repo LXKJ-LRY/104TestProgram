@@ -48,11 +48,13 @@ else()
         find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt5 REQUIRED COMPONENTS Core)
 
         add_executable(testProgram
             ${PROJECT_SOURCES}
             dbdatahandler.h dbdatahandler.cpp
             settingManager/settingmanager.h settingManager/settingmanager.cpp
+            iec104controller.h iec104controller.cpp
 
 
 
@@ -66,6 +68,7 @@ target_link_libraries(testProgram PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(testProgram PRIVATE Qt5::Widgets)
 target_link_libraries(testProgram PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(testProgram PRIVATE Qt5::Sql)
+target_link_libraries(testProgram PRIVATE Qt5::Core)
 target_link_libraries(testProgram PRIVATE Qt5::Core)
 target_link_libraries(testProgram PRIVATE Qt5::Core)
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -119,7 +119,7 @@ void DBDataHandler::addNewSettingToDB()
     }
 }
 
-void DBDataHandler::onRefreshSettingComboBox(QList<QString> settingsNameList)
+void DBDataHandler::onRefreshSettingComboBox()
 {
     sql.clear();
     sql = "select SettingName from t_ConnectionSettings";
@@ -129,6 +129,7 @@ void DBDataHandler::onRefreshSettingComboBox(QList<QString> settingsNameList)
         sql.clear();
         return;
     }
+    QList<QString> settingsNameList;
     while(query.next())
     {
         settingsNameList.append(query.value("SettingName").toString());
@@ -170,5 +171,46 @@ void DBDataHandler::onAddNewSettingToDB()
     qDebug() << "hello2";
     addNewSettingToDB();
     emit addNewSettingToDBFinished();
+}
+
+void DBDataHandler::onDeleteSettingFromDB(QString singleSettingName)
+{
+    sql.clear();
+    sql = "delete from t_ConnectionSettings where SettingName=:singleSettingName;";
+    query.prepare(sql);
+    query.bindValue(":singleSettingName", singleSettingName);
+    if(!query.exec())
+    {
+        qDebug() << QString("从数据库中删除 配置记录: %1  失败，请稍后重试").arg(singleSettingName);
+        sql.clear();
+        return;
+    }
+
+    qDebug() << QString("从数据库中删除 配置记录: %1 成功").arg(singleSettingName);
+    sql.clear();
+    emit deleteSettingFromDBFinished();
+}
+
+void DBDataHandler::onSaveSettingToDB(const QList<QString> singleSettinginfo)
+{
+    sql.clear();
+    sql = "update t_ConnectionSettings set SettingName=:newName, LocalMasterAddr=:newLocalAddr, LocalPort=:newLocalport, "
+          "RemoteSlaveAddr=:newRemoteAddr, RemotePort=:newRemotePort where SettingName=:oldName";
+    query.prepare(sql);
+    query.bindValue(":oldName", singleSettinginfo[0]);
+    query.bindValue(":newName", singleSettinginfo[1]);
+    query.bindValue(":newLocalAddr", singleSettinginfo[2]);
+    query.bindValue(":newLocalport", singleSettinginfo[3].toInt());
+    query.bindValue(":newRemoteAddr", singleSettinginfo[4]);
+    query.bindValue(":newRemotePort", singleSettinginfo[5].toInt());
+    if(!query.exec())
+    {
+        qDebug() << "保存配置失败，请稍后再试";
+        sql.clear();
+        return;
+    }
+    qDebug() << "保存配置到数据库成功";
+    emit saveSettingToDBFinished();
+    sql.clear();
 }
 

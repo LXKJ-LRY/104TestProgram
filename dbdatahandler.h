@@ -30,15 +30,19 @@ public:
     static void release();
 
     void addNewSettingToDB();
-    void onRefreshSettingComboBox(QList<QString> settingsNameList);
+    void onRefreshSettingComboBox();
     void querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo);
 
 signals:
     void addNewSettingToDBFinished();
-    void querySettingsNameFinished(QList<QString> settingsNameList);
+    void querySettingsNameFinished(const QList<QString> settingsNameList);
+    void deleteSettingFromDBFinished();
+    void saveSettingToDBFinished();
 
 public slots:
     void onAddNewSettingToDB();
+    void onDeleteSettingFromDB(const QString singleSettingName);
+    void onSaveSettingToDB(const QList<QString> singleSettinginfo);
 
 private:
     DBDataHandler(QObject *parent = nullptr);

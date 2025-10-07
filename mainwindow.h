@@ -36,10 +36,10 @@ public:
     void setupConnections();
 
 signals:
-    void refreshComboBoxFromDB(QList<QString> settingsNameList);
+    void refreshComboBoxFromDB();
     void addNewSettingToDB();
-    void saveSettingToDB();
-    void deleteSettingFromDB();
+    void saveSettingToDB(const QList<QString> singleSettinginfo);
+    void deleteSettingFromDB(const QString singleSettingName);
 
 
 private slots:
@@ -53,8 +53,12 @@ private slots:
     void onAddNewSettingToDBFinished();
 
     void onDeleteSettingButtonClicked();
+    void onDeleteSettingFromDBFinished();
+
     void onSaveSettingButtonClicked();
-    void onQuerySettingsNameFinished(QList<QString> settingsNameList);
+    void onSaveSettingToDBFinished();
+
+    void onQuerySettingsNameFinished(const QList<QString> settingsNameList);
 
 
 private:
@@ -67,8 +71,6 @@ private:
 
     DBDataHandler* _dbDataHandler = nullptr;
     QThread* _dbThread = nullptr;
-
-    QList<QString> settingsNameList;
 
     int settingComboCurrentIndex = 0;
     int settingComboLastIndex = -1;
