@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   setupConnections();
 
+  initialEdits();
+
   RefreshSettingComboBox();
 }
 
@@ -22,6 +24,7 @@ MainWindow::~MainWindow()
     _104Thread->quit();
     _104Thread->wait();
   }
+  _104Controller->release();
   if (_dbThread != nullptr)
   {
     _dbThread->quit();
@@ -37,15 +40,15 @@ void MainWindow::initialize()
   ui->testPageButton->setEnabled(false);
   ui->disconnectButton->setEnabled(false);
 
-  _104Thread = new QThread(this);
-  _104controller = new Iec104Controller(this);
-  _104controller->moveToThread(_104Thread);
-  _104Thread->start();
-
   _dbThread = new QThread(this);
   _dbDataHandler = DBDataHandler::instance();
   _dbDataHandler->moveToThread(_dbThread);
   _dbThread->start();
+
+  _104Thread = new QThread(this);
+  _104Controller = Iec104Controller::instance();
+  _104Controller->moveToThread(_104Thread);
+  _104Thread->start();
 
   _setting = new QSettings(QApplication::applicationDirPath() + "/ConnectionSetting.ini", QSettings::Format::IniFormat, this);
   _setting->setValue("/ConnectionSetting/SettingName","新的配置");
@@ -53,6 +56,27 @@ void MainWindow::initialize()
   _setting->setValue("/ConnectionSetting/LocalPort","2404");
   _setting->setValue("/ConnectionSetting/RemoteSlaveAddr","127.0.0.1");
   _setting->setValue("/ConnectionSetting/RemotePort","2404");
+}
+
+void MainWindow::initialEdits()
+{
+  {
+    auto va = new QRegularExpressionValidator(this);
+    QRegularExpression reg("^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$");
+    va->setRegularExpression(reg);
+    _ipValidator = va;
+  }
+  {
+    auto va = new QIntValidator(this);
+    va->setRange(0, 65535);
+    _portValidator = va;
+  }
+
+  ui->localMasterAddrEdit->setValidator(_ipValidator);
+  ui->remoteSlaveAddrEdit->setValidator(_ipValidator);
+  ui->localPortEdit->setValidator(_portValidator);
+  ui->remotePortEdit->setValidator(_portValidator);
+
 }
 
 void MainWindow::setupConnections()
@@ -79,6 +103,8 @@ void MainWindow::setupConnections()
 
   connect(ui->connectButton, &QAbstractButton::clicked, this, &MainWindow::onConnectButtonClicked);
   connect(ui->disconnectButton, &QAbstractButton::clicked, this, &MainWindow::onDisconnectButtonClicked);
+
+
 }
 
 
@@ -130,11 +156,19 @@ void MainWindow::RefreshSettingComboBox()
   emit refreshComboBoxFromDB();
 }
 
-
+void MainWindow::clearAllEdit()
+{
+  ui->nameEdit->clear();
+  ui->localMasterAddrEdit->clear();
+  ui->localPortEdit->clear();
+  ui->remoteSlaveAddrEdit->clear();
+  ui->remotePortEdit->clear();
+  ui->saveSettingButton->setEnabled(false);
+}
 
 void MainWindow::onSettingComboBoxchanged(int index)
 {
-  if(index == -1)
+  if (index == -1)
   {
     qDebug() << " 刷新 settingCombo 时的清空阶段,index = -1，跳过此 onSettingComboBoxchanged ";
     return;
@@ -210,48 +244,54 @@ void MainWindow::onSaveSettingToDBFinished()
 
 void MainWindow::onQuerySettingsNameFinished(QList<QString> settingsNameList)
 {
-  if(settingsNameList.isEmpty())
+  if (settingsNameList.isEmpty())
   {
+    clearAllEdit();
     QMessageBox::warning(this, tr("dont have config"), tr("no settings"));
     return;
   }
-  for(auto& settingName : settingsNameList)
+  for (auto& settingName : settingsNameList)
   {
     ui->settingComboBox->addItem(settingName);
   }
   qDebug() << "刷新 settingComboBox 成功";
+  ui->saveSettingButton->setEnabled(true);
   settingsNameList.clear();
 }
 
 void MainWindow::onConnectButtonClicked()
 {
-  ui->connectButton->setEnabled(false);
-  ui->disconnectButton->setEnabled(true);
-  ui->settingComboBox->setEnabled(false);
-  ui->nameEdit->setEnabled(false);
-  ui->localMasterAddrEdit->setEnabled(false);
-  ui->localPortEdit->setEnabled(false);
-  ui->remoteSlaveAddrEdit->setEnabled(false);
-  ui->remotePortEdit->setEnabled(false);
-  ui->newSettingButton->setEnabled(false);
-  ui->deleteSettingButton->setEnabled(false);
-  ui->saveSettingButton->setEnabled(false);
+  if (ui->localMasterAddrEdit->text().isEmpty() || ui->localPortEdit->text().isEmpty() || ui->remoteSlaveAddrEdit->text().isEmpty() || ui->remotePortEdit->text().isEmpty() )
+  {
+    QMessageBox::warning(this, "connect failed", "Host/ Port is empty");
+    return;
+  }
+  enableEditAndButton(false);
 
+  ui->connectionSettingNameLabel->setText("连接配置: " + ui->nameEdit->text());
+  emit connectButtonClicked(ui->localMasterAddrEdit->text(), ui->localPortEdit->text().toInt(), ui->remoteSlaveAddrEdit->text(), ui->remotePortEdit->text().toInt());
 }
 
 void MainWindow::onDisconnectButtonClicked()
 {
-  ui->connectButton->setEnabled(true);
-  ui->disconnectButton->setEnabled(false);
-  ui->settingComboBox->setEnabled(true);
-  ui->nameEdit->setEnabled(true);
-  ui->localMasterAddrEdit->setEnabled(true);
-  ui->localPortEdit->setEnabled(true);
-  ui->remoteSlaveAddrEdit->setEnabled(true);
-  ui->remotePortEdit->setEnabled(true);
-  ui->newSettingButton->setEnabled(true);
-  ui->deleteSettingButton->setEnabled(true);
-  ui->saveSettingButton->setEnabled(true);
+  enableEditAndButton(true);
+
+  ui->connectionSettingNameLabel->setText("停止服务");
+  emit disconnectbuttonClicked();
 }
 
+void MainWindow::enableEditAndButton(bool enable)
+{
+  ui->connectButton->setEnabled(enable);
+  ui->disconnectButton->setEnabled(!enable);
+  ui->settingComboBox->setEnabled(enable);
+  ui->nameEdit->setEnabled(enable);
+  ui->localMasterAddrEdit->setEnabled(enable);
+  ui->localPortEdit->setEnabled(enable);
+  ui->remoteSlaveAddrEdit->setEnabled(enable);
+  ui->remotePortEdit->setEnabled(enable);
+  ui->newSettingButton->setEnabled(enable);
+  ui->deleteSettingButton->setEnabled(enable);
+  ui->saveSettingButton->setEnabled(enable);
+}
 

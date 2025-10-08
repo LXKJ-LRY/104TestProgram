@@ -108,10 +108,10 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="testPage">
-       <widget class="QLabel" name="label_6">
+       <widget class="QLabel" name="connectionSettingNameLabel">
         <property name="geometry">
          <rect>
           <x>90</x>
@@ -152,6 +152,9 @@
             <pointsize>12</pointsize>
            </font>
           </property>
+          <property name="maxLength">
+           <number>30</number>
+          </property>
          </widget>
         </item>
         <item row="3" column="1">
@@ -166,6 +169,9 @@
            <font>
             <pointsize>12</pointsize>
            </font>
+          </property>
+          <property name="maxLength">
+           <number>20</number>
           </property>
          </widget>
         </item>
@@ -192,6 +198,9 @@
             <pointsize>12</pointsize>
            </font>
           </property>
+          <property name="maxLength">
+           <number>20</number>
+          </property>
          </widget>
         </item>
         <item row="4" column="1">
@@ -206,6 +215,9 @@
            <font>
             <pointsize>12</pointsize>
            </font>
+          </property>
+          <property name="maxLength">
+           <number>6</number>
           </property>
          </widget>
         </item>
@@ -261,6 +273,9 @@
            <font>
             <pointsize>12</pointsize>
            </font>
+          </property>
+          <property name="maxLength">
+           <number>6</number>
           </property>
          </widget>
         </item>

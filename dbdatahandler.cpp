@@ -40,7 +40,7 @@ DBDataHandler* DBDataHandler::instance()
 
 void DBDataHandler::release()
 {
-  if( _instance != nullptr)
+  if (_instance != nullptr)
   {
     delete _instance;
     _instance = nullptr;
@@ -106,7 +106,7 @@ void DBDataHandler::addNewSettingToDB()
   }
 
   query.prepare("INSERT INTO t_ConnectionSettings (SettingName, LocalMasterAddr, LocalPort, RemoteSlaveAddr, RemotePort)"
-                " VALUES (:name, '0.0.0.0', '0', '0.0.0.0', '0');");
+                " VALUES (:name, '127.0.0.1', '2404', '127.0.0.1', '2404');");
   query.bindValue(":name", newName);
 
   if (query.exec())
@@ -123,14 +123,14 @@ void DBDataHandler::onRefreshSettingComboBox()
 {
   sql.clear();
   sql = "select SettingName from t_ConnectionSettings";
-  if(!query.exec(sql))
+  if (!query.exec(sql))
   {
     qDebug() << "查询已有设置名称失败";
     sql.clear();
     return;
   }
   QList<QString> settingsNameList;
-  while(query.next())
+  while (query.next())
   {
     settingsNameList.append(query.value("SettingName").toString());
   }
@@ -144,14 +144,14 @@ void DBDataHandler::querySingleSettingInfo(QString& settingName, QList<QString>&
   sql = "select * from t_ConnectionSettings where SettingName==:singleSettingName;";
   query.prepare(sql);
   query.bindValue(":singleSettingName", settingName);
-  if(!query.exec())
+  if (!query.exec())
   {
     qDebug() << "查询失败";
     sql.clear();
     return;
   }
 
-  if(query.next())
+  if (query.next())
   {
     singleSettingInfo.append(query.value(ConnectionSettingsColum::SettingName).toString());
     singleSettingInfo.append(query.value(ConnectionSettingsColum::LocalMasterAddr).toString());
@@ -179,7 +179,7 @@ void DBDataHandler::onDeleteSettingFromDB(QString singleSettingName)
   sql = "delete from t_ConnectionSettings where SettingName=:singleSettingName;";
   query.prepare(sql);
   query.bindValue(":singleSettingName", singleSettingName);
-  if(!query.exec())
+  if (!query.exec())
   {
     qDebug() << QString("从数据库中删除 配置记录: %1  失败，请稍后重试").arg(singleSettingName);
     sql.clear();
@@ -203,7 +203,7 @@ void DBDataHandler::onSaveSettingToDB(const QList<QString> singleSettinginfo)
   query.bindValue(":newLocalport", singleSettinginfo[3].toInt());
   query.bindValue(":newRemoteAddr", singleSettinginfo[4]);
   query.bindValue(":newRemotePort", singleSettinginfo[5].toInt());
-  if(!query.exec())
+  if (!query.exec())
   {
     qDebug() << "保存配置失败，请稍后再试";
     sql.clear();

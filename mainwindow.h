@@ -12,6 +12,7 @@
 #include <QDialog>
 #include <QThread>
 #include <QMessageBox>
+#include <QValidator>
 
 
 QT_BEGIN_NAMESPACE
@@ -42,6 +43,8 @@ signals:
   void saveSettingToDB(const QList<QString> singleSettinginfo);
   void deleteSettingFromDB(const QString singleSettingName);
 
+  void connectButtonClicked(QString localAddr, int localPort, QString remoteAddr, int remotePort);
+  void disconnectbuttonClicked();
 
 private slots:
   void onSettingPageButtonClicked();
@@ -66,7 +69,11 @@ private slots:
 
 private:
   void initialize();
+  void initialEdits();
   void RefreshSettingComboBox();
+  void clearAllEdit();
+
+  void enableEditAndButton(bool enable);
 
   Ui::MainWindow *ui;
   QSettings* _setting;
@@ -76,8 +83,11 @@ private:
   DBDataHandler* _dbDataHandler = nullptr;
   QThread* _dbThread = nullptr;
 
-  Iec104Controller* _104controller;
+  Iec104Controller* _104Controller;
   QThread* _104Thread;
+
+  QValidator* _ipValidator = nullptr;
+  QValidator* _portValidator = nullptr;
 
   int settingComboCurrentIndex = 0;
   int settingComboLastIndex = -1;
