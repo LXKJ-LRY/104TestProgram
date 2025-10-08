@@ -12,47 +12,47 @@
 
 class DBDataHandler : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    enum ConnectionSettingsColum
-    {
-        SettingID = 0,
-        SettingName,
-        LocalMasterAddr,
-        LocalPort,
-        RemoteSlaveAddr,
-        Remoteport
-    };
+  enum ConnectionSettingsColum
+  {
+    SettingID = 0,
+    SettingName,
+    LocalMasterAddr,
+    LocalPort,
+    RemoteSlaveAddr,
+    Remoteport
+  };
 
 public:
-    static DBDataHandler* instance();
+  static DBDataHandler* instance();
 
-    static void release();
+  static void release();
 
-    void addNewSettingToDB();
-    void onRefreshSettingComboBox();
-    void querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo);
+  void addNewSettingToDB();
+  void onRefreshSettingComboBox();
+  void querySingleSettingInfo(QString& settingName, QList<QString>& singleSettingInfo);
 
 signals:
-    void addNewSettingToDBFinished();
-    void querySettingsNameFinished(const QList<QString> settingsNameList);
-    void deleteSettingFromDBFinished();
-    void saveSettingToDBFinished();
+  void addNewSettingToDBFinished();
+  void querySettingsNameFinished(const QList<QString> settingsNameList);
+  void deleteSettingFromDBFinished();
+  void saveSettingToDBFinished();
 
 public slots:
-    void onAddNewSettingToDB();
-    void onDeleteSettingFromDB(const QString singleSettingName);
-    void onSaveSettingToDB(const QList<QString> singleSettinginfo);
+  void onAddNewSettingToDB();
+  void onDeleteSettingFromDB(const QString singleSettingName);
+  void onSaveSettingToDB(const QList<QString> singleSettinginfo);
 
 private:
-    DBDataHandler(QObject *parent = nullptr);
-    DBDataHandler(const DBDataHandler& ){}
-    ~DBDataHandler();
+  DBDataHandler(QObject *parent = nullptr);
+  DBDataHandler(const DBDataHandler& ){}
+  ~DBDataHandler();
 
-    static DBDataHandler* _instance;
-    QSqlDatabase dataBase;
-    QSqlQuery query;
-    QString sql;
+  static DBDataHandler* _instance;
+  QSqlDatabase dataBase;
+  QSqlQuery query;
+  QString sql;
 
 };
 

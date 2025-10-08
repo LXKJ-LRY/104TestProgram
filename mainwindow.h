@@ -22,64 +22,64 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
-enum stackedPageIndex
-{
+  enum stackedPageIndex
+  {
     testPage = 0,
     settingPage,
-};
+  };
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+  MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
 
-    void setupConnections();
+  void setupConnections();
 
 signals:
-    void refreshComboBoxFromDB();
-    void addNewSettingToDB();
-    void saveSettingToDB(const QList<QString> singleSettinginfo);
-    void deleteSettingFromDB(const QString singleSettingName);
+  void refreshComboBoxFromDB();
+  void addNewSettingToDB();
+  void saveSettingToDB(const QList<QString> singleSettinginfo);
+  void deleteSettingFromDB(const QString singleSettingName);
 
 
 private slots:
-    void onSettingPageButtonClicked();
-    void onTestPageButtonClicked();
-    void onDeviceListButtonClicked();
+  void onSettingPageButtonClicked();
+  void onTestPageButtonClicked();
+  void onDeviceListButtonClicked();
 
-    void onSettingComboBoxchanged(int index);
+  void onSettingComboBoxchanged(int index);
 
-    void onNewSettingButtonClicked();
-    void onAddNewSettingToDBFinished();
+  void onNewSettingButtonClicked();
+  void onAddNewSettingToDBFinished();
 
-    void onDeleteSettingButtonClicked();
-    void onDeleteSettingFromDBFinished();
+  void onDeleteSettingButtonClicked();
+  void onDeleteSettingFromDBFinished();
 
-    void onSaveSettingButtonClicked();
-    void onSaveSettingToDBFinished();
+  void onSaveSettingButtonClicked();
+  void onSaveSettingToDBFinished();
 
-    void onQuerySettingsNameFinished(const QList<QString> settingsNameList);
+  void onQuerySettingsNameFinished(const QList<QString> settingsNameList);
 
-    void onConnectButtonClicked();
-    void onDisconnectButtonClicked();
+  void onConnectButtonClicked();
+  void onDisconnectButtonClicked();
 
 private:
-    void initialize();
-    void RefreshSettingComboBox();
+  void initialize();
+  void RefreshSettingComboBox();
 
-    Ui::MainWindow *ui;
-    QSettings* _setting;
+  Ui::MainWindow *ui;
+  QSettings* _setting;
 
-    SettingManager* _settingManager;
+  SettingManager* _settingManager;
 
-    DBDataHandler* _dbDataHandler = nullptr;
-    QThread* _dbThread = nullptr;
+  DBDataHandler* _dbDataHandler = nullptr;
+  QThread* _dbThread = nullptr;
 
-    Iec104Controller* _104controller;
-    QThread* _104Thread;
+  Iec104Controller* _104controller;
+  QThread* _104Thread;
 
-    int settingComboCurrentIndex = 0;
-    int settingComboLastIndex = -1;
+  int settingComboCurrentIndex = 0;
+  int settingComboLastIndex = -1;
 };
 #endif // MAINWINDOW_H

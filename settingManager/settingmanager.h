@@ -5,9 +5,9 @@
 
 class SettingManager : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    explicit SettingManager(QObject *parent = nullptr);
+  explicit SettingManager(QObject *parent = nullptr);
 
 signals:
 };

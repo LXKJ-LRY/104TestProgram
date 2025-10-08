@@ -5,11 +5,19 @@
 
 class Iec104Controller : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    explicit Iec104Controller(QObject *parent = nullptr);
+
 
 signals:
+
+private:
+  explicit Iec104Controller(QObject *parent = nullptr);
+  Iec104Controller(const Iec104Controller&) {}
+  ~Iec104Controller();
+
+
+
 };
 
 #endif // IEC1_4CONTROLLER_H
