@@ -24,7 +24,18 @@ public:
   static void connectionHandler(void* parameter, CS104_Connection connection, CS104_ConnectionEvent event);
   static void rawMessageHandler(void* parameter, uint8_t* msg, int msgSize, bool sent);
 
+  void sentTestCommand();
+
+private:
+  void setupTimers();
+
 signals:
+
+
+private slots:
+  void onReconnectTimerTriggered();
+  void onInterrogationTimerTriggered();
+
 
 private:
   QTimer* _reconnectTimer = nullptr;
@@ -36,6 +47,11 @@ private:
 
   // Strategy
   std::shared_ptr<IEC104MasterStrategy> _strategy;
+
+  QString localAddr;
+  int localPort;
+  QString remoteAddr;
+  int remotePort;
 };
 
 #endif // IEC1_4MASTER_H

@@ -22,7 +22,7 @@ DBDataHandler::DBDataHandler(QObject *parent)
   sql.clear();
 
   sql = "create table if not exists t_Devices "
-        "(DeviceNO integer primary key autoincrement, DeviceName text, Address integer, YXpoint integer, YKpoint integer);";
+        "(DeviceID integer primary key autoincrement, DeviceName text, Address integer, YXpoint integer, YKpoint integer);";
   qDebug() << "创建设备表：" << (bool)query.exec(sql);
   sql.clear();
 

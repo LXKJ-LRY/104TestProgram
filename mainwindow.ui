@@ -124,6 +124,19 @@
          <string>主测试界面</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="sendTestOrderButton">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>170</y>
+          <width>161</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>发送测试命令</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="settingPage">
        <layout class="QGridLayout" name="gridLayout_2">

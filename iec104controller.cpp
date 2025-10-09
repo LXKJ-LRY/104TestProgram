@@ -31,5 +31,11 @@ void Iec104Controller::onConnection(QString localAddr, int localPort, QString re
 
 void Iec104Controller::onDisConnection()
 {
+  qDebug() << "stop1";
   master->stop();
+}
+
+void Iec104Controller::onSendTestOrderButton()
+{
+  master->sentTestCommand();
 }

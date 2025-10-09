@@ -2,10 +2,32 @@
 
 IEC104Master::IEC104Master(QObject *parent)
     : QObject{parent}
-{}
+{
+
+  setupTimers();
+}
+
+void IEC104Master::setupTimers()
+{
+  _reconnectTimer = new QTimer(this);
+  _reconnectTimer->setInterval(10000);
+  _reconnectTimer->setSingleShot(true);
+  connect(_reconnectTimer, &QTimer::timeout,
+          this, &IEC104Master::onReconnectTimerTriggered);
+
+  _interrogationTimer = new QTimer(this);
+  _interrogationTimer->setInterval(10000);
+  _interrogationTimer->setSingleShot(true);
+  connect(_interrogationTimer, &QTimer::timeout,
+          this, &IEC104Master::onInterrogationTimerTriggered);
+}
 
 void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, int remotePort)
 {
+  this->localAddr = localAddr;
+  this->localPort = localPort;
+  this->remoteAddr = remoteAddr;
+  this->remotePort = remotePort;
   // stop old connection before start
   qDebug() << "hello4";
   if (_con)
@@ -18,7 +40,7 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
   }
 
 
-  _con = CS104_Connection_create(remoteAddr.toStdString().c_str(), remotePort);
+  _con = CS104_Connection_create(this->remoteAddr.toStdString().c_str(), this->remotePort);
   if (_con == nullptr)
   {
     qDebug() <<"IEC104 Master: Start failed, connection object create failed.";
@@ -41,12 +63,24 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
 
 bool IEC104Master::stop()
 {
+  qDebug() << "stop2";
   if (_con)
   {
     CS104_Connection_destroy(_con);
     _con = nullptr;
-
+    qDebug() << "stop3";
   }
+
+  if (_interrogationTimer && _interrogationTimer->isActive())
+  {
+    _interrogationTimer->stop();
+  }
+
+  if (_reconnectTimer && _reconnectTimer->isActive())
+  {
+    _reconnectTimer->stop();
+  }
+  qDebug() << "stop4";
 
   return true;
 }
@@ -160,8 +194,23 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
     break;
   default:
     // log invalid type
-
+    qDebug() << QString("IEC-104 Master: Asdu dropped with type not handled, type: %1").arg(asduType);
     return false;
   }
   return true;
+}
+
+void IEC104Master::onReconnectTimerTriggered()
+{
+
+}
+
+void IEC104Master::onInterrogationTimerTriggered()
+{
+
+}
+
+void IEC104Master::sentTestCommand()
+{
+
 }

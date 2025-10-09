@@ -59,8 +59,9 @@ find_package(Qt5 REQUIRED COMPONENTS Core)
             settingManager/settingmanager.h settingManager/settingmanager.cpp
             iec104controller.h iec104controller.cpp
             IEC104/iec104master.h IEC104/iec104master.cpp
-            IEC104/iec104masterstrategy.h IEC104/iec104masterstrategy.cpp
+            IEC104/iec104masterstrategy.h
             IEC104/remotecontrollockmasterstrategy.h IEC104/remotecontrollockmasterstrategy.cpp
+            IEC104/iec104masterstrategyfactory.h IEC104/iec104masterstrategyfactory.cpp
 
 
 
