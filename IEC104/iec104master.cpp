@@ -7,6 +7,7 @@ IEC104Master::IEC104Master(QObject *parent)
 void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, int remotePort)
 {
   // stop old connection before start
+  qDebug() << "hello4";
   if (_con)
   {
     if (stop() == false)

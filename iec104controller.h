@@ -17,9 +17,9 @@ public:
 
 signals:
 
-private slots:
-  void onConnectButtonClicked(QString localAddr, int localPort, QString remoteAddr, int remotePort);
-
+public slots:
+  void onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort);
+  void onDisConnection();
 
 private:
   explicit Iec104Controller(QObject *parent = nullptr);

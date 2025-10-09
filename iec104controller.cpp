@@ -23,7 +23,13 @@ Iec104Controller::~Iec104Controller()
 }
 
 
-void Iec104Controller::onConnectButtonClicked(QString localAddr, int localPort, QString remoteAddr, int remotePort)
+void Iec104Controller::onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort)
 {
+  qDebug() << "hello2";
+  master->start(localAddr, localPort, remoteAddr, remotePort);
+}
 
+void Iec104Controller::onDisConnection()
+{
+  master->stop();
 }

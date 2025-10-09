@@ -104,13 +104,13 @@ void MainWindow::setupConnections()
   connect(ui->connectButton, &QAbstractButton::clicked, this, &MainWindow::onConnectButtonClicked);
   connect(ui->disconnectButton, &QAbstractButton::clicked, this, &MainWindow::onDisconnectButtonClicked);
 
-
+  connect(this, &MainWindow::connectButtonClicked, _104Controller, &Iec104Controller::onConnection, Qt::QueuedConnection);
+  connect(this, &MainWindow::disconnectbuttonClicked, _104Controller, &Iec104Controller::onDisConnection, Qt::QueuedConnection);
 }
 
 
 void MainWindow::onSettingPageButtonClicked()
 {
-  qDebug() << "setting";
   ui->stackedWidget->setCurrentIndex(stackedPageIndex::settingPage);
   ui->testPageButton->setEnabled(true);
   ui->settingPageButton->setEnabled(false);
@@ -118,7 +118,6 @@ void MainWindow::onSettingPageButtonClicked()
 
 void MainWindow::onTestPageButtonClicked()
 {
-  qDebug() << "test";
   ui->stackedWidget->setCurrentIndex(stackedPageIndex::testPage);
   ui->testPageButton->setEnabled(false);
   ui->settingPageButton->setEnabled(true);
@@ -136,14 +135,12 @@ void MainWindow::onNewSettingButtonClicked()
   ui->newSettingButton->setEnabled(false);
   ui->saveSettingButton->setEnabled(false);
   ui->deleteSettingButton->setEnabled(false);
-  qDebug() << "hello1";
   emit addNewSettingToDB();
 
 }
 
 void MainWindow::onAddNewSettingToDBFinished()
 {
-  qDebug() << "hello4";
   RefreshSettingComboBox();
   ui->newSettingButton->setEnabled(true);
   ui->saveSettingButton->setEnabled(true);
@@ -269,6 +266,7 @@ void MainWindow::onConnectButtonClicked()
   enableEditAndButton(false);
 
   ui->connectionSettingNameLabel->setText("连接配置: " + ui->nameEdit->text());
+  qDebug() << "hello1";
   emit connectButtonClicked(ui->localMasterAddrEdit->text(), ui->localPortEdit->text().toInt(), ui->remoteSlaveAddrEdit->text(), ui->remotePortEdit->text().toInt());
 }
 

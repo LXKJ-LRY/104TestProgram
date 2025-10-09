@@ -49,7 +49,6 @@ void DBDataHandler::release()
 
 void DBDataHandler::addNewSettingToDB()
 {
-  qDebug() << "hello3";
   static QString baseName = "新的配置";
 
   sql = "SELECT SettingName FROM t_ConnectionSettings WHERE SettingName LIKE :baseName;";
@@ -168,7 +167,6 @@ void DBDataHandler::querySingleSettingInfo(QString& settingName, QList<QString>&
 
 void DBDataHandler::onAddNewSettingToDB()
 {
-  qDebug() << "hello2";
   addNewSettingToDB();
   emit addNewSettingToDBFinished();
 }
