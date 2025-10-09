@@ -62,6 +62,7 @@ find_package(Qt5 REQUIRED COMPONENTS Core)
             IEC104/iec104masterstrategy.h
             IEC104/remotecontrollockmasterstrategy.h IEC104/remotecontrollockmasterstrategy.cpp
             IEC104/iec104masterstrategyfactory.h IEC104/iec104masterstrategyfactory.cpp
+            devicetablewidget.h devicetablewidget.cpp devicetablewidget.ui
 
 
 

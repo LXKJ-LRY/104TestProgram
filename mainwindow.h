@@ -4,6 +4,7 @@
 #include "dbdatahandler.h"
 #include "settingManager/settingmanager.h"
 #include "iec104controller.h"
+#include "devicetablewidget.h"
 
 #include <QMainWindow>
 #include <QSettings>

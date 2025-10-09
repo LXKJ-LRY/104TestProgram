@@ -2,6 +2,15 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>DeviceTableWidget</name>
+    <message>
+        <location filename="devicetablewidget.ui" line="14"/>
+        <location filename="build/testProgram_autogen/include/ui_devicetablewidget.h" line="35"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
@@ -106,13 +115,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="249"/>
+        <location filename="mainwindow.cpp" line="253"/>
         <source>dont have config</source>
         <oldsource>don&apos;t have config</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="249"/>
+        <location filename="mainwindow.cpp" line="253"/>
         <source>no settings</source>
         <translation type="unfinished"></translation>
     </message>

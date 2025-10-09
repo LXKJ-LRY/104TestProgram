@@ -127,9 +127,13 @@ void MainWindow::onTestPageButtonClicked()
 
 void MainWindow::onDeviceListButtonClicked()
 {
-  std::unique_ptr<QDialog> dialog(new QDialog(this));
-  dialog->setMinimumSize(800, 600);
-  dialog->exec();
+    qDebug() << "设备点表按钮被点击，准备显示窗口";
+    // 创建DeviceTableWidget窗口实例，父窗口设为当前主窗口
+    DeviceTableWidget *deviceTableWindow = new DeviceTableWidget(this);
+    // 设置窗口最小尺寸（可选，根据需要调整）
+    deviceTableWindow->setMinimumSize(800, 600);
+    // 显示窗口
+    deviceTableWindow->show();
 }
 
 void MainWindow::onNewSettingButtonClicked()
