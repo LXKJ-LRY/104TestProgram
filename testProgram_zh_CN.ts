@@ -2,11 +2,30 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>DevicePointDialog</name>
+    <message>
+        <location filename="devicepointdialog.ui" line="14"/>
+        <location filename="build/testProgram_autogen/include/ui_devicepointdialog.h" line="40"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="devicepointdialog.ui" line="26"/>
+        <location filename="build/testProgram_autogen/include/ui_devicepointdialog.h" line="41"/>
+        <source>PushButton</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DeviceTableWidget</name>
     <message>
-        <location filename="devicetablewidget.ui" line="14"/>
-        <location filename="build/testProgram_autogen/include/ui_devicetablewidget.h" line="35"/>
+        <location filename="build/testProgram_autogen/include/ui_devicetablewidget.h" line="40"/>
         <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="build/testProgram_autogen/include/ui_devicetablewidget.h" line="41"/>
+        <source>PushButton</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

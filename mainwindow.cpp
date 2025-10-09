@@ -128,11 +128,11 @@ void MainWindow::onTestPageButtonClicked()
 void MainWindow::onDeviceListButtonClicked()
 {
     qDebug() << "设备点表按钮被点击，准备显示窗口";
-    // 创建DeviceTableWidget窗口实例，父窗口设为当前主窗口
-    DeviceTableWidget *deviceTableWindow = new DeviceTableWidget(this);
-    // 设置窗口最小尺寸（可选，根据需要调整）
+
+    // 创建DeviceTableWidget实例，父窗口为主窗口
+    DevicePointDialog *deviceTableWindow = new DevicePointDialog(this);
     deviceTableWindow->setMinimumSize(800, 600);
-    // 显示窗口
+    deviceTableWindow->setWindowTitle("设备点表"); // 设置标题便于识别
     deviceTableWindow->show();
 }
 
