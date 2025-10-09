@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+  setWindowTitle("104测试程序");
 
   initialize();
 
@@ -127,12 +128,9 @@ void MainWindow::onTestPageButtonClicked()
 
 void MainWindow::onDeviceListButtonClicked()
 {
-    qDebug() << "设备点表按钮被点击，准备显示窗口";
-
-    // 创建DeviceTableWidget实例，父窗口为主窗口
     DevicePointDialog *deviceTableWindow = new DevicePointDialog(this);
     deviceTableWindow->setMinimumSize(800, 600);
-    deviceTableWindow->setWindowTitle("设备点表"); // 设置标题便于识别
+    deviceTableWindow->setWindowTitle("设备点表");
     deviceTableWindow->show();
 }
 

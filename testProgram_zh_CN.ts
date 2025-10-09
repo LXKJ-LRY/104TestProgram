@@ -134,13 +134,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="253"/>
+        <location filename="mainwindow.cpp" line="250"/>
         <source>dont have config</source>
         <oldsource>don&apos;t have config</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="253"/>
+        <location filename="mainwindow.cpp" line="250"/>
         <source>no settings</source>
         <translation type="unfinished"></translation>
     </message>
