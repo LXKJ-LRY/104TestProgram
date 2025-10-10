@@ -17,19 +17,6 @@
     </message>
 </context>
 <context>
-    <name>DeviceTableWidget</name>
-    <message>
-        <location filename="build/testProgram_autogen/include/ui_devicetablewidget.h" line="40"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="build/testProgram_autogen/include/ui_devicetablewidget.h" line="41"/>
-        <source>PushButton</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
@@ -134,22 +121,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="250"/>
+        <location filename="mainwindow.cpp" line="252"/>
         <source>dont have config</source>
         <oldsource>don&apos;t have config</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="250"/>
+        <location filename="mainwindow.cpp" line="252"/>
         <source>no settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RemoteControlLockMasterStrategy</name>
-    <message>
-        <location filename="IEC104/remotecontrollockmasterstrategy.cpp" line="10"/>
-        <source>Quering Remote Control Device Status ...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

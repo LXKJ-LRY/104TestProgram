@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
   ui->setupUi(this);
   setWindowTitle("104测试程序");
+  setMinimumSize(800,600);
 
   initialize();
 
@@ -108,7 +109,7 @@ void MainWindow::setupConnections()
   connect(this, &MainWindow::connectButtonClicked, _104Controller, &Iec104Controller::onConnection, Qt::QueuedConnection);
   connect(this, &MainWindow::disconnectbuttonClicked, _104Controller, &Iec104Controller::onDisConnection, Qt::QueuedConnection);
 
-  connect(ui->sendTestOrderButton, &QAbstractButton::clicked, _104Controller, &Iec104Controller::onSendTestOrderButton, Qt::QueuedConnection);
+  connect(ui->sendTestCommandButton, &QAbstractButton::clicked, _104Controller, &Iec104Controller::onSendTestCommandButton, Qt::QueuedConnection);
 }
 
 

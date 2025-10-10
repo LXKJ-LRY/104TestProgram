@@ -124,7 +124,7 @@
          <string>主测试界面</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="sendTestOrderButton">
+       <widget class="QPushButton" name="sendTestCommandButton">
         <property name="geometry">
          <rect>
           <x>40</x>

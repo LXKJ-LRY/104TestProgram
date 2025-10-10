@@ -20,7 +20,7 @@ signals:
 public slots:
   void onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort);
   void onDisConnection();
-  void onSendTestOrderButton();
+  void onSendTestCommandButton();
 
 private:
   explicit Iec104Controller(QObject *parent = nullptr);

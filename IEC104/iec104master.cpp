@@ -3,7 +3,7 @@
 IEC104Master::IEC104Master(QObject *parent)
     : QObject{parent}
 {
-
+  _strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
   setupTimers();
 }
 
@@ -22,8 +22,14 @@ void IEC104Master::setupTimers()
           this, &IEC104Master::onInterrogationTimerTriggered);
 }
 
+
 void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, int remotePort)
 {
+  if (!_isEnabled.load())
+  {
+    qDebug() << "连接手动关闭,";
+    return;
+  }
   this->localAddr = localAddr;
   this->localPort = localPort;
   this->remoteAddr = remoteAddr;
@@ -41,6 +47,8 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
 
 
   _con = CS104_Connection_create(this->remoteAddr.toStdString().c_str(), this->remotePort);
+  qDebug() << "---Connecting to: " << remoteAddr << ": " << remotePort;
+
   if (_con == nullptr)
   {
     qDebug() <<"IEC104 Master: Start failed, connection object create failed.";
@@ -93,23 +101,27 @@ void IEC104Master::connectionHandler(void* parameter, CS104_Connection connectio
   switch (event)
   {
   case CS104_CONNECTION_OPENED:
+    qDebug() << "Connection established\n";
     CS104_Connection_sendStartDT(connection);
-    //pThis->handleConnectionOpened();
+    pThis->handleConnectionOpened();
     break;
 
   case CS104_CONNECTION_CLOSED:
-    //pThis->handleConnectionClosed();
+    qDebug() << "Connection closed\n";
+    pThis->handleConnectionClosed();
     break;
 
   case CS104_CONNECTION_STARTDT_CON_RECEIVED:
-    //pThis->sendInterrogation();
+    qDebug() << "send interrogation 发送总召";
+    pThis->sendInterrogation();
     break;
 
   case CS104_CONNECTION_STOPDT_CON_RECEIVED:
     break;
 
   case CS104_CONNECTION_FAILED:
-    //pThis->handleConnectionFailed();
+    qDebug() << "Connection failed\n";
+    pThis->handleConnectionFailed();
     break;
   }
 
@@ -202,15 +214,84 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
 
 void IEC104Master::onReconnectTimerTriggered()
 {
+  if (this->localAddr.isEmpty() || this->remoteAddr.isEmpty())
+  {
+    qDebug() << "地址信息不全,请补充后再次手动连接";
+    stop();
+    _isEnabled.store(false);
+    return;
+  }
 
+  start(this->localAddr, this->localPort, this->remoteAddr, this->remotePort);
 }
 
 void IEC104Master::onInterrogationTimerTriggered()
 {
-
+  sendInterrogation();
 }
 
 void IEC104Master::sentTestCommand()
 {
+  struct sCP56Time2a testTimestamp;
+  CP56Time2a_createFromMsTimestamp(&testTimestamp, Hal_getTimeInMs());
+
+  CS104_Connection_sendTestCommandWithTimestamp(_con, 1, 0x01, &testTimestamp);
 
 }
+
+void IEC104Master::handleConnectionOpened()
+{
+  _isConnected.store(true);
+}
+
+void IEC104Master::handleConnectionClosed()
+{
+  _isConnected.store(false);
+
+  QMetaObject::invokeMethod(this, [this]()
+                            {
+                              stop();
+                              if(_isEnabled.load())
+                              {
+                                _reconnectTimer->start();
+                              }
+                            }, Qt::QueuedConnection);
+}
+
+void IEC104Master::handleConnectionFailed()
+{
+  handleConnectionClosed();
+}
+
+void IEC104Master::sendInterrogation()
+{
+  if (_con == nullptr) // stopped
+  {
+    qDebug() << "IEC104 Master: Connection stopped while ready to send interrogation.";
+    return;
+  }
+
+  if (CS104_Connection_sendInterrogationCommand(_con, CS101_COT_ACTIVATION, 1, IEC60870_QOI_STATION) == false)
+  {
+    qDebug() << "IEC104 Master: Send interrogation failed!.";
+    QMetaObject::invokeMethod(this, [this]()
+                              {
+                                _interrogationTimer->start();
+                              }, Qt::QueuedConnection);
+  }
+
+
+}
+
+
+void IEC104Master::onConnectButtonClicked()
+{
+  _isEnabled.store(true);
+}
+
+void IEC104Master::onDisconnectButtonClicked()
+{
+  _isEnabled.store(false);
+}
+
+

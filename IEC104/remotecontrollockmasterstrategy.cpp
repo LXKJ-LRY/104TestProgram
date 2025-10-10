@@ -2,25 +2,25 @@
 
 RemoteControlLockMasterStrategy::RemoteControlLockMasterStrategy()
 {
-  {
-    _progressDialog = std::make_shared<QDialog>();
-    _progressDialog->setModal(true);
+  // {
+  //   _progressDialog = std::make_shared<QDialog>();
+  //   _progressDialog->setModal(true);
 
-    auto layout = new QVBoxLayout(_progressDialog.get());
-    auto label = new QLabel(tr("Quering Remote Control Device Status ..."));
-    auto progressBar = new QProgressBar(_progressDialog.get());
-    progressBar->setRange(0, 0);
+  //   auto layout = new QVBoxLayout(_progressDialog.get());
+  //   auto label = new QLabel(tr("Quering Remote Control Device Status ..."));
+  //   auto progressBar = new QProgressBar(_progressDialog.get());
+  //   progressBar->setRange(0, 0);
 
-    progressBar->setStyleSheet( "QProgressBar {" " border: 2px solid grey;" " border-radius: 5px;" " text-align: center;" " background: #f3f3f3;" "}" "QProgressBar::chunk {" " background: #05B8CC;" " width: 20px;" " margin: 0.5px;" "}" );
+  //   progressBar->setStyleSheet( "QProgressBar {" " border: 2px solid grey;" " border-radius: 5px;" " text-align: center;" " background: #f3f3f3;" "}" "QProgressBar::chunk {" " background: #05B8CC;" " width: 20px;" " margin: 0.5px;" "}" );
 
-    layout->addWidget(label);
-    layout->addWidget(progressBar);
+  //   layout->addWidget(label);
+  //   layout->addWidget(progressBar);
 
-    _progressDialog->setLayout(layout);
-    _progressDialog->setMinimumSize(_progressDialog->sizeHint());
-    _progressDialog->setMaximumSize(_progressDialog->sizeHint());
-    _progressDialog->setWindowFlags(_progressDialog->windowFlags() & ~Qt::WindowCloseButtonHint);
-  }
+  //   _progressDialog->setLayout(layout);
+  //   _progressDialog->setMinimumSize(_progressDialog->sizeHint());
+  //   _progressDialog->setMaximumSize(_progressDialog->sizeHint());
+  //   _progressDialog->setWindowFlags(_progressDialog->windowFlags() & ~Qt::WindowCloseButtonHint);
+  // }
 }
 
 void RemoteControlLockMasterStrategy::handleSPNA(CS101_ASDU asdu)

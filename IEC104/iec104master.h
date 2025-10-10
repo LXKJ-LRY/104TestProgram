@@ -2,7 +2,10 @@
 #define IEC1_4MASTER_H
 
 #include "lib60870/cs104_connection.h"
+#include "lib60870/hal_time.h"
+#include "lib60870/hal_thread.h"
 #include "iec104masterstrategy.h"
+#include "iec104masterstrategyfactory.h"
 
 #include <QObject>
 #include <QTimer>
@@ -26,8 +29,17 @@ public:
 
   void sentTestCommand();
 
+  void onConnectButtonClicked();
+  void onDisconnectButtonClicked();
+
 private:
   void setupTimers();
+
+  void handleConnectionOpened();
+  void handleConnectionClosed();
+  void handleConnectionFailed();
+
+  void sendInterrogation();
 
 signals:
 
@@ -36,7 +48,6 @@ private slots:
   void onReconnectTimerTriggered();
   void onInterrogationTimerTriggered();
 
-
 private:
   QTimer* _reconnectTimer = nullptr;
   QTimer* _interrogationTimer = nullptr;
@@ -44,6 +55,8 @@ private:
   CS104_Connection _con = nullptr;
 
   std::atomic_bool _isConnected;
+
+  std::atomic_bool _isEnabled;
 
   // Strategy
   std::shared_ptr<IEC104MasterStrategy> _strategy;

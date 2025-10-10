@@ -26,16 +26,18 @@ Iec104Controller::~Iec104Controller()
 void Iec104Controller::onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort)
 {
   qDebug() << "hello2";
+  master->onConnectButtonClicked();
   master->start(localAddr, localPort, remoteAddr, remotePort);
 }
 
 void Iec104Controller::onDisConnection()
 {
   qDebug() << "stop1";
+  master->onDisconnectButtonClicked();
   master->stop();
 }
 
-void Iec104Controller::onSendTestOrderButton()
+void Iec104Controller::onSendTestCommandButton()
 {
   master->sentTestCommand();
 }
