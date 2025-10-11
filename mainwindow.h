@@ -14,6 +14,8 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QValidator>
+#include <QMetaType>
+#include <QMap>
 
 
 QT_BEGIN_NAMESPACE
@@ -36,7 +38,8 @@ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
-  void setupConnections();
+  void setupSelfConnections();
+  void setupOtherConnections();
 
 signals:
   void refreshComboBoxFromDB();
@@ -46,6 +49,9 @@ signals:
 
   void connectButtonClicked(QString localAddr, int localPort, QString remoteAddr, int remotePort);
   void disconnectbuttonClicked();
+
+  void sendChoosedRelayYKClose(int ioa);
+  void sendChoosedRelayYKOpen(int ioa);
 
 private slots:
   void onSettingPageButtonClicked();
@@ -67,6 +73,17 @@ private slots:
 
   void onConnectButtonClicked();
   void onDisconnectButtonClicked();
+
+  void onConnectionEstablished(bool isEnabled);
+  void onConnectionClosed(bool isEnabled);
+
+  void onMasterReceiveCot20(const QMap<int, bool> relayStatus);
+  void onMasterReceiveSinglePointStatus(int ioa, bool isClose);
+
+  void onChoose1CheckBoxClicked();
+  void onChoose2CheckBoxClicked();
+  void onChoose3CheckBoxClicked();
+  void onChoose4CheckBoxClicked();
 
 private:
   void initialize();

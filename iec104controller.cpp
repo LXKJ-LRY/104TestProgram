@@ -15,6 +15,12 @@ Iec104Controller::Iec104Controller(QObject *parent)
     : QObject{parent}
 {
   master = new IEC104Master(this);
+  qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
+
+  connect(master, &IEC104Master::connectionEstablished, this, &Iec104Controller::masterEstablishConnection);
+  connect(master, &IEC104Master::connectionClosed, this, &Iec104Controller::masterConnectionClosed);
+  connect(master, &IEC104Master::receiveCot20, this, &Iec104Controller::masterReceiveCot20);
+  connect(master, &IEC104Master::receiveSinglePointStatus, this, &Iec104Controller::masterReceiveSinglePointStatus);
 }
 
 Iec104Controller::~Iec104Controller()
@@ -39,5 +45,25 @@ void Iec104Controller::onDisConnection()
 
 void Iec104Controller::onSendTestCommandButton()
 {
-  master->sentTestCommand();
+  master->sendTestCommand();
+}
+
+void Iec104Controller::onSendYKOpenButtonClicked()
+{
+  master->sendYKOpen();
+}
+
+void Iec104Controller::onSendYKCloseButtonClicked()
+{
+  master->sendYKClose();
+}
+
+void Iec104Controller::onSendChoosedRelayYKClose(int ioa)
+{
+  master->sendChoosedYKClose(ioa);
+}
+
+void Iec104Controller::onSendChoosedRelayYKOpen(int ioa)
+{
+  master->sendChoosedYKOpen(ioa);
 }

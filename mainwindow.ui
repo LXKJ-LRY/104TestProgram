@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
-    <height>1200</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="pageVerticalLayout">
       <item>
        <widget class="QPushButton" name="testPageButton">
         <property name="sizePolicy">
@@ -111,37 +111,213 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="testPage">
-       <widget class="QLabel" name="connectionSettingNameLabel">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>40</y>
-          <width>491</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>主测试界面</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="sendTestCommandButton">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>170</y>
-          <width>161</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>发送测试命令</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="connectionSettingNameLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">#connectionSettingNameLabel{
+color: rgb(255, 0, 0);
+}</string>
+          </property>
+          <property name="text">
+           <string>主测试界面：简要信息</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="testGroupBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>测试选项</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="chooseVLayout">
+             <item>
+              <widget class="QLabel" name="chooseRelayLabel">
+               <property name="text">
+                <string>选择要闭合的继电器：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="choose1CheckBox">
+               <property name="text">
+                <string>1#继电器</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="choose2CheckBox">
+               <property name="text">
+                <string>2#继电器</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="choose3CheckBox">
+               <property name="text">
+                <string>3#继电器</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="choose4CheckBox">
+               <property name="text">
+                <string>4#继电器</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="1">
+            <layout class="QVBoxLayout" name="testVLayout">
+             <item>
+              <widget class="QLabel" name="testRelayLabel">
+               <property name="text">
+                <string>选择要测试的继电器：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="test1CheckBox">
+               <property name="text">
+                <string>1#继电器</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="test2CheckBox">
+               <property name="text">
+                <string>2#继电器</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="test3CheckBox">
+               <property name="text">
+                <string>3#继电器</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="test4CheckBox">
+               <property name="text">
+                <string>4#继电器</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="startTestButton">
+             <property name="text">
+              <string>开始测试</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QPushButton" name="stopTestButton">
+             <property name="text">
+              <string>停止测试</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="testButtonHLayout">
+          <item>
+           <widget class="QPushButton" name="sendTestCommandButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>发送测试命令</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="sendYKOpenButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>ioa1开</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="sendYKCloseButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>ioa1关</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="settingPage">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="6" column="0">
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="remotePortLabel">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -235,7 +411,7 @@
          </widget>
         </item>
         <item row="4" column="0">
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="localPortLabel">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -247,7 +423,7 @@
          </widget>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="remoteHostLabel">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -387,7 +563,7 @@
          </layout>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="localHostLabel">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -399,7 +575,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="nameLabel">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -421,7 +597,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1600</width>
+     <width>1200</width>
      <height>19</height>
     </rect>
    </property>

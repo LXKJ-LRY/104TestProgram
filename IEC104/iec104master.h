@@ -12,6 +12,9 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QThread>
+#include <QMetaType>
+#include <QMap>
+
 
 class IEC104Master : public QObject
 {
@@ -27,7 +30,12 @@ public:
   static void connectionHandler(void* parameter, CS104_Connection connection, CS104_ConnectionEvent event);
   static void rawMessageHandler(void* parameter, uint8_t* msg, int msgSize, bool sent);
 
-  void sentTestCommand();
+  void sendTestCommand();
+  bool sendYKOpen();
+  bool sendYKClose();
+
+  bool sendChoosedYKOpen(int ioa);
+  bool sendChoosedYKClose(int ioa);
 
   void onConnectButtonClicked();
   void onDisconnectButtonClicked();
@@ -41,14 +49,30 @@ private:
 
   void sendInterrogation();
 
-signals:
+  // M_SP_NA_1
+  void handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu);
+  // M_DP_NA_1
+  void handleRecvRequestUpdateDevStatusDP(CS101_ASDU asdu);
+  // M_BO_NA_1
+  void handleRecvRequestUpdateMultiDevicesStatus(CS101_ASDU asdu);
+  // C_SC_NA_1
+  void handleRecvRequestCheckSingleAmoStep(CS101_ASDU asdu);
+  // TYPE: 43
+  void handleRecvRequestCheckOperationTicket(CS101_ASDU asdu);
 
+signals:
+  void connectionEstablished(bool isEnabled);
+  void connectionClosed(bool isEnabled);
+
+  void receiveCot20(const QMap<int, bool> relayStatus);
+  void receiveSinglePointStatus(int ioa, bool isClose);
 
 private slots:
   void onReconnectTimerTriggered();
   void onInterrogationTimerTriggered();
 
 private:
+  QMap<int, bool> relayStatus;
   QTimer* _reconnectTimer = nullptr;
   QTimer* _interrogationTimer = nullptr;
 
@@ -58,6 +82,8 @@ private:
 
   std::atomic_bool _isEnabled;
 
+  std::atomic_bool _isUnderTest;
+
   // Strategy
   std::shared_ptr<IEC104MasterStrategy> _strategy;
 
@@ -65,6 +91,7 @@ private:
   int localPort;
   QString remoteAddr;
   int remotePort;
+
 };
 
 #endif // IEC1_4MASTER_H

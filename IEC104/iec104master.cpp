@@ -4,6 +4,8 @@ IEC104Master::IEC104Master(QObject *parent)
     : QObject{parent}
 {
   _strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
+  qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
+
   setupTimers();
 }
 
@@ -139,7 +141,7 @@ void IEC104Master::rawMessageHandler(void* parameter, uint8_t* msg, int msgSize,
   {
     printStr += QString::number(msg[i], 16).toUpper() + " ";
   }
-  qDebug() << "--" + printStr + "--";
+  qDebug() <<  printStr;
 }
 
 /*
@@ -154,8 +156,11 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
 
   auto asduType = CS101_ASDU_getTypeID(asdu);
   auto asduElemCount = CS101_ASDU_getNumberOfElements(asdu);
-
+  auto cot = CS101_ASDU_getCOT(asdu);
   auto ca = CS101_ASDU_getCA(asdu);
+
+  qDebug() << "---RECVD ASDU type: " << asduType << " || elements: " << asduElemCount << " || ca: " << ca << " || cot: " << cot;
+
   if (ca != 1)
   {
 
@@ -166,7 +171,7 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
   {
   case M_ME_TE_1:
   {
-    printf("  measured scaled values with CP56Time2a timestamp:\n");
+    qDebug() << "  measured scaled values with CP56Time2a timestamp:\n";
 
     int i;
 
@@ -176,16 +181,15 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
       MeasuredValueScaledWithCP56Time2a io =
           (MeasuredValueScaledWithCP56Time2a) CS101_ASDU_getElement(asdu, i);
 
-      printf("    IOA: %i value: %i\n",
-             InformationObject_getObjectAddress((InformationObject) io),
-             MeasuredValueScaled_getValue((MeasuredValueScaled) io)
-             );
+      qDebug() << QString("    IOA: %1 value: %2\n").arg(
+                                                        InformationObject_getObjectAddress((InformationObject) io)).arg(
+                          MeasuredValueScaled_getValue((MeasuredValueScaled) io));
 
       MeasuredValueScaledWithCP56Time2a_destroy(io);
     }
   } break;
   case M_SP_NA_1: // single point YX
-    //pThis->handleRecvRequestUpdateDeviceStatus(asdu);
+    pThis->handleRecvRequestUpdateDeviceStatus(asdu);
     break;
   case M_DP_NA_1: // double point YX
     //pThis->handleRecvRequestUpdateDevStatusDP(asdu);
@@ -194,9 +198,19 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
     //pThis->handleRecvRequestUpdateMultiDevicesStatus(asdu);
     break;
   case C_TS_TA_1: // test with timestamp
-    printf("  test command with timestamp\n");
+    qDebug() << ("  test command with timestamp\n");
     break;
   case C_SC_NA_1: // amo single step
+    for (int i = 0; i < asduElemCount; i++)
+    {
+
+      auto object = CS101_ASDU_getElement(asdu, i);
+
+      qDebug() << QString("---IOA: %1 cot: %2 asduType: %3").arg(
+                          InformationObject_getObjectAddress(object)).arg(cot).arg(asduType);
+
+      InformationObject_destroy(object);
+    }
     //pThis->handleRecvRequestCheckSingleAmoStep(asdu);
     break;
   case 43: // type of operate ticket
@@ -230,7 +244,7 @@ void IEC104Master::onInterrogationTimerTriggered()
   sendInterrogation();
 }
 
-void IEC104Master::sentTestCommand()
+void IEC104Master::sendTestCommand()
 {
   struct sCP56Time2a testTimestamp;
   CP56Time2a_createFromMsTimestamp(&testTimestamp, Hal_getTimeInMs());
@@ -239,15 +253,110 @@ void IEC104Master::sentTestCommand()
 
 }
 
+
+bool IEC104Master::sendYKOpen()
+{
+  if (_con == nullptr)
+  {
+    qDebug() << "   no create connection";
+    return false;
+  }
+
+  if (!_isConnected.load())
+  {
+    qDebug() << "   connection closed";
+    return false;
+  }
+
+  InformationObject openRelay = (InformationObject)SingleCommand_create(NULL, 0x6001, false, false, 0);
+  if (CS104_Connection_sendProcessCommandEx(_con, CS101_COT_ACTIVATION, 1, openRelay) == false)
+  {
+    qDebug() << "IEC104 Master: Send Open Relay failed.";
+    return false;
+  }
+  return true;
+}
+
+bool IEC104Master::sendYKClose()
+{
+  if (_con == nullptr)
+  {
+    qDebug() << "   no create connection";
+    return false;
+  }
+
+  if (!_isConnected.load())
+  {
+    qDebug() << "   connection closed";
+    return false;
+  }
+
+  InformationObject closeRelay = (InformationObject)SingleCommand_create(NULL, 0x6001, true, false, 0);
+  if (CS104_Connection_sendProcessCommandEx(_con, CS101_COT_ACTIVATION, 1, closeRelay) == false)
+  {
+    qDebug() << "IEC104 Master: Send Close Relay failed.";
+    return false;
+  }
+  return true;
+
+}
+
+bool IEC104Master::sendChoosedYKOpen(int ioa)
+{
+  if (_con == nullptr)
+  {
+    qDebug() << "   no create connection";
+    return false;
+  }
+
+  if (!_isConnected.load())
+  {
+    qDebug() << "   connection closed";
+    return false;
+  }
+
+  InformationObject openRelay = (InformationObject)SingleCommand_create(NULL, ioa, false, false, 0);
+  if (CS104_Connection_sendProcessCommandEx(_con, CS101_COT_ACTIVATION, 1, openRelay) == false)
+  {
+    qDebug() << "IEC104 Master: Send Open Relay failed.";
+    return false;
+  }
+  return true;
+}
+
+bool IEC104Master::sendChoosedYKClose(int ioa)
+{
+  if (_con == nullptr)
+  {
+    qDebug() << "   no create connection";
+    return false;
+  }
+
+  if (!_isConnected.load())
+  {
+    qDebug() << "   connection closed";
+    return false;
+  }
+
+  InformationObject closeRelay = (InformationObject)SingleCommand_create(NULL, ioa, true, false, 0);
+  if (CS104_Connection_sendProcessCommandEx(_con, CS101_COT_ACTIVATION, 1, closeRelay) == false)
+  {
+    qDebug() << "IEC104 Master: Send Close Relay failed.";
+    return false;
+  }
+  return true;
+}
+
 void IEC104Master::handleConnectionOpened()
 {
   _isConnected.store(true);
+  emit connectionEstablished(_isEnabled.load());
 }
 
 void IEC104Master::handleConnectionClosed()
 {
   _isConnected.store(false);
-
+  emit connectionClosed(_isEnabled.load());
   QMetaObject::invokeMethod(this, [this]()
                             {
                               stop();
@@ -280,6 +389,55 @@ void IEC104Master::sendInterrogation()
                               }, Qt::QueuedConnection);
   }
 
+
+}
+
+void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
+{
+  auto asduElemCount = CS101_ASDU_getNumberOfElements(asdu);
+  auto cot = CS101_ASDU_getCOT(asdu);
+
+  if (cot == 20)
+  {
+    for (int i = 0; i < asduElemCount; i++)
+    {
+      if(i % 4 != 1) continue;
+
+      auto object = CS101_ASDU_getElement(asdu, i);
+
+      qDebug() << QString(" --IOA: %1 value: %2 quality: %3").arg(
+                                                                  InformationObject_getObjectAddress(object)).arg(
+                          SinglePointInformation_getValue((SinglePointInformation) object)).arg(
+                          SinglePointInformation_getQuality((SinglePointInformation) object));
+
+      relayStatus[InformationObject_getObjectAddress(object)] = SinglePointInformation_getValue((SinglePointInformation) object);
+      qDebug() << "'    QMap relayStatus test' || IOA: " << \
+          InformationObject_getObjectAddress(object) << " sta"\
+          "us: " << SinglePointInformation_getValue((SinglePointInformation) object);
+
+      InformationObject_destroy(object);
+    }
+    emit receiveCot20(relayStatus);
+  }
+  else if (cot == 3)
+  {
+    auto object = CS101_ASDU_getElement(asdu, 0);
+
+    qDebug() << QString("  -IOA: %1 value: %2 ").arg(
+                        InformationObject_getObjectAddress(object)).arg(
+                        SinglePointInformation_getValue((SinglePointInformation) object));
+
+    relayStatus[InformationObject_getObjectAddress(object)] = SinglePointInformation_getValue((SinglePointInformation) object);
+    qDebug() << "'    QMap relayStatus test' || IOA: " << \
+        InformationObject_getObjectAddress(object) << " sta"\
+        "us: " << SinglePointInformation_getValue((SinglePointInformation) object);
+
+    InformationObject_destroy(object);
+  }
+  else
+  {
+
+  }
 
 }
 

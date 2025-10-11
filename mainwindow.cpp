@@ -10,9 +10,12 @@ MainWindow::MainWindow(QWidget *parent)
   setWindowTitle("104测试程序");
   setMinimumSize(800,600);
 
+  qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
+
   initialize();
 
-  setupConnections();
+  setupSelfConnections();
+  setupOtherConnections();
 
   initialEdits();
 
@@ -41,6 +44,7 @@ void MainWindow::initialize()
   ui->stackedWidget->setCurrentIndex(0);
   ui->testPageButton->setEnabled(false);
   ui->disconnectButton->setEnabled(false);
+  ui->testGroupBox->setEnabled(false);
 
   _dbThread = new QThread(this);
   _dbDataHandler = DBDataHandler::instance();
@@ -81,7 +85,38 @@ void MainWindow::initialEdits()
 
 }
 
-void MainWindow::setupConnections()
+void MainWindow::setupOtherConnections()
+{
+
+  connect(this, &MainWindow::addNewSettingToDB, _dbDataHandler, &DBDataHandler::onAddNewSettingToDB, Qt::QueuedConnection);
+  connect(_dbDataHandler, &DBDataHandler::addNewSettingToDBFinished, this, &MainWindow::onAddNewSettingToDBFinished, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::deleteSettingFromDB, _dbDataHandler, &DBDataHandler::onDeleteSettingFromDB, Qt::QueuedConnection);
+  connect(_dbDataHandler, &DBDataHandler::deleteSettingFromDBFinished, this, &MainWindow::onDeleteSettingFromDBFinished, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::saveSettingToDB, _dbDataHandler, &DBDataHandler::onSaveSettingToDB, Qt::QueuedConnection);
+  connect(_dbDataHandler, &DBDataHandler::saveSettingToDBFinished, this, &MainWindow::onSaveSettingToDBFinished, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::refreshComboBoxFromDB, _dbDataHandler, &DBDataHandler::onRefreshSettingComboBox, Qt::QueuedConnection);
+  connect(_dbDataHandler, &DBDataHandler::querySettingsNameFinished, this, &MainWindow::onQuerySettingsNameFinished, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::connectButtonClicked, _104Controller, &Iec104Controller::onConnection, Qt::QueuedConnection);
+  connect(this, &MainWindow::disconnectbuttonClicked, _104Controller, &Iec104Controller::onDisConnection, Qt::QueuedConnection);
+
+  connect(ui->sendTestCommandButton, &QAbstractButton::clicked, _104Controller, &Iec104Controller::onSendTestCommandButton, Qt::QueuedConnection);
+  connect(ui->sendYKOpenButton, &QAbstractButton::clicked, _104Controller, &Iec104Controller::onSendYKOpenButtonClicked, Qt::QueuedConnection);
+  connect(ui->sendYKCloseButton, &QAbstractButton::clicked, _104Controller, &Iec104Controller::onSendYKCloseButtonClicked, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::sendChoosedRelayYKOpen, _104Controller, &Iec104Controller::onSendChoosedRelayYKOpen, Qt::QueuedConnection);
+  connect(this, &MainWindow::sendChoosedRelayYKClose, _104Controller, &Iec104Controller::onSendChoosedRelayYKClose, Qt::QueuedConnection);
+
+  connect(_104Controller, &Iec104Controller::masterEstablishConnection, this, &MainWindow::onConnectionEstablished);
+  connect(_104Controller, &Iec104Controller::masterConnectionClosed, this, &MainWindow::onConnectionClosed);
+  connect(_104Controller, &Iec104Controller::masterReceiveCot20, this, &MainWindow::onMasterReceiveCot20, Qt::QueuedConnection);
+  connect(_104Controller, &Iec104Controller::masterReceiveSinglePointStatus, this, &MainWindow::onMasterReceiveSinglePointStatus, Qt::QueuedConnection);
+}
+
+void MainWindow::setupSelfConnections()
 {
   connect(ui->testPageButton, &QAbstractButton::clicked, this, &MainWindow::onTestPageButtonClicked);
   connect(ui->settingPageButton, &QAbstractButton::clicked, this, &MainWindow::onSettingPageButtonClicked);
@@ -89,27 +124,16 @@ void MainWindow::setupConnections()
   connect(ui->settingComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &MainWindow::onSettingComboBoxchanged);
 
   connect(ui->newSettingButton, &QAbstractButton::clicked, this, &MainWindow::onNewSettingButtonClicked);
-  connect(this, &MainWindow::addNewSettingToDB, _dbDataHandler, &DBDataHandler::onAddNewSettingToDB, Qt::QueuedConnection);
-  connect(_dbDataHandler, &DBDataHandler::addNewSettingToDBFinished, this, &MainWindow::onAddNewSettingToDBFinished, Qt::QueuedConnection);
-
   connect(ui->deleteSettingButton, &QAbstractButton::clicked, this, &MainWindow::onDeleteSettingButtonClicked);
-  connect(this, &MainWindow::deleteSettingFromDB, _dbDataHandler, &DBDataHandler::onDeleteSettingFromDB, Qt::QueuedConnection);
-  connect(_dbDataHandler, &DBDataHandler::deleteSettingFromDBFinished, this, &MainWindow::onDeleteSettingFromDBFinished, Qt::QueuedConnection);
-
   connect(ui->saveSettingButton, &QAbstractButton::clicked, this, &MainWindow::onSaveSettingButtonClicked);
-  connect(this, &MainWindow::saveSettingToDB, _dbDataHandler, &DBDataHandler::onSaveSettingToDB, Qt::QueuedConnection);
-  connect(_dbDataHandler, &DBDataHandler::saveSettingToDBFinished, this, &MainWindow::onSaveSettingToDBFinished, Qt::QueuedConnection);
-
-  connect(this, &MainWindow::refreshComboBoxFromDB, _dbDataHandler, &DBDataHandler::onRefreshSettingComboBox, Qt::QueuedConnection);
-  connect(_dbDataHandler, &DBDataHandler::querySettingsNameFinished, this, &MainWindow::onQuerySettingsNameFinished, Qt::QueuedConnection);
 
   connect(ui->connectButton, &QAbstractButton::clicked, this, &MainWindow::onConnectButtonClicked);
   connect(ui->disconnectButton, &QAbstractButton::clicked, this, &MainWindow::onDisconnectButtonClicked);
 
-  connect(this, &MainWindow::connectButtonClicked, _104Controller, &Iec104Controller::onConnection, Qt::QueuedConnection);
-  connect(this, &MainWindow::disconnectbuttonClicked, _104Controller, &Iec104Controller::onDisConnection, Qt::QueuedConnection);
-
-  connect(ui->sendTestCommandButton, &QAbstractButton::clicked, _104Controller, &Iec104Controller::onSendTestCommandButton, Qt::QueuedConnection);
+  connect(ui->choose1CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose1CheckBoxClicked);
+  connect(ui->choose2CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose2CheckBoxClicked);
+  connect(ui->choose3CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose3CheckBoxClicked);
+  connect(ui->choose4CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose4CheckBoxClicked);
 }
 
 
@@ -129,10 +153,10 @@ void MainWindow::onTestPageButtonClicked()
 
 void MainWindow::onDeviceListButtonClicked()
 {
-    DevicePointDialog *deviceTableWindow = new DevicePointDialog(this);
-    deviceTableWindow->setMinimumSize(800, 600);
-    deviceTableWindow->setWindowTitle("设备点表");
-    deviceTableWindow->show();
+  DevicePointDialog *deviceTableWindow = new DevicePointDialog(this);
+  deviceTableWindow->setMinimumSize(800, 600);
+  deviceTableWindow->setWindowTitle("设备点表");
+  deviceTableWindow->show();
 }
 
 void MainWindow::onNewSettingButtonClicked()
@@ -278,10 +302,114 @@ void MainWindow::onConnectButtonClicked()
 void MainWindow::onDisconnectButtonClicked()
 {
   enableEditAndButton(true);
-
-  ui->connectionSettingNameLabel->setText("停止服务");
+  //ui->connectionSettingNameLabel->setText("停止服务");
   emit disconnectbuttonClicked();
 }
+
+void MainWindow::onConnectionEstablished(bool isEnabled)
+{
+  ui->testGroupBox->setEnabled(true);
+  ui->connectionSettingNameLabel->setText(QString("连接建立: ") + ui->nameEdit->text());
+}
+
+void MainWindow::onConnectionClosed(bool isEnabled)
+{
+  ui->testGroupBox->setEnabled(false);
+  if (isEnabled)
+    ui->connectionSettingNameLabel->setText(QString("连接中断: 尝试重连: ") + ui->nameEdit->text());
+  else
+    ui->connectionSettingNameLabel->setText(QString("停止服务: ") + ui->nameEdit->text());
+}
+
+void MainWindow::onMasterReceiveCot20(const QMap<int, bool> relayStatus)
+{
+  ui->choose1CheckBox->setChecked(relayStatus[2]);
+  ui->choose2CheckBox->setChecked(relayStatus[6]);
+  ui->choose3CheckBox->setChecked(relayStatus[10]);
+  ui->choose4CheckBox->setChecked(relayStatus[14]);
+}
+
+void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool isClose)
+{
+  switch (ioa)
+  {
+  case 2:
+
+    break;
+  case 6:
+
+    break;
+  case 10:
+
+    break;
+  case 14:
+
+    break;
+  default:
+    qDebug() << "没有收到单点数据";
+    break;
+  }
+}
+
+void MainWindow::onChoose1CheckBoxClicked()
+{
+  if (ui->choose1CheckBox->isChecked())
+  {
+    ui->test1CheckBox->setEnabled(false);
+    emit sendChoosedRelayYKClose(0x6001);
+  }
+  else
+  {
+    ui->test1CheckBox->setEnabled(true);
+    emit sendChoosedRelayYKOpen(0x6001);
+  }
+
+}
+
+void MainWindow::onChoose2CheckBoxClicked()
+{
+  if (ui->choose2CheckBox->isChecked())
+  {
+    ui->test2CheckBox->setEnabled(false);
+    emit sendChoosedRelayYKClose(0x6002);
+  }
+  else
+  {
+    ui->test2CheckBox->setEnabled(true);
+    emit sendChoosedRelayYKOpen(0x6002);
+  }
+}
+
+void MainWindow::onChoose3CheckBoxClicked()
+{
+  if (ui->choose3CheckBox->isChecked())
+  {
+    ui->test3CheckBox->setEnabled(false);
+    emit sendChoosedRelayYKClose(0x6003);
+  }
+  else
+  {
+    ui->test3CheckBox->setEnabled(true);
+    emit sendChoosedRelayYKOpen(0x6003);
+
+  }
+}
+
+void MainWindow::onChoose4CheckBoxClicked()
+{
+  if (ui->choose4CheckBox->isChecked())
+  {
+    ui->test4CheckBox->setEnabled(false);
+    emit sendChoosedRelayYKClose(0x6004);
+  }
+  else
+  {
+    ui->test4CheckBox->setEnabled(true);
+    emit sendChoosedRelayYKOpen(0x6004);
+  }
+}
+
+
 
 void MainWindow::enableEditAndButton(bool enable)
 {

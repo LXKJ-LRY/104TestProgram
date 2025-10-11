@@ -6,6 +6,9 @@
 #include <QObject>
 #include <QVariant>
 #include <memory>
+#include <QMetaType>
+#include <QMap>
+
 
 class Iec104Controller : public QObject
 {
@@ -16,11 +19,22 @@ public:
 
 
 signals:
+  void masterEstablishConnection(bool isEnabled);
+  void masterConnectionClosed(bool isEnabled);
+
+  void masterReceiveCot20(const QMap<int, bool> relayStatus);
+  void masterReceiveSinglePointStatus(int ioa, bool isClose);
 
 public slots:
   void onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort);
   void onDisConnection();
   void onSendTestCommandButton();
+
+  void onSendYKOpenButtonClicked();
+  void onSendYKCloseButtonClicked();
+
+  void onSendChoosedRelayYKClose(int ioa);
+  void onSendChoosedRelayYKOpen(int ioa);
 
 private:
   explicit Iec104Controller(QObject *parent = nullptr);
