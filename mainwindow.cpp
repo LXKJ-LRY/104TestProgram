@@ -300,7 +300,7 @@ void MainWindow::onConnectButtonClicked()
 {
   if (ui->localMasterAddrEdit->text().isEmpty() || ui->localPortEdit->text().isEmpty() || ui->remoteSlaveAddrEdit->text().isEmpty() || ui->remotePortEdit->text().isEmpty() )
   {
-    QMessageBox::warning(this, "connect failed", "Host/ Port is empty");
+    QMessageBox::warning(this, "connect failed", "Host / Port is empty");
     return;
   }
   enableEditAndButton(false);
