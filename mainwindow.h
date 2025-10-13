@@ -81,7 +81,7 @@ private slots:
   void onConnectionClosed(bool isEnabled);
 
   void onMasterReceiveCot20(const QMap<int, bool> relayStatus);
-  void onMasterReceiveSinglePointStatus(int ioa, bool isClose);
+  void onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int receiveNO, int testNO, int testFailedNO);
 
   void onChoose1CheckBoxClicked();
   void onChoose2CheckBoxClicked();

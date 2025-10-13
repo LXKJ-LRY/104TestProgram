@@ -165,8 +165,6 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
   auto cot = CS101_ASDU_getCOT(asdu);
   auto ca = CS101_ASDU_getCA(asdu);
 
-  qDebug() << "---RECVD ASDU type: " << asduType << " || elements: " << asduElemCount << " || ca: " << ca << " || cot: " << cot;
-
   if (ca != 1)
   {
 
@@ -450,23 +448,28 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
   }
   else if (cot == 3)
   {
-    if (_isUnderTest.load())
-    {
-      receivceSingleNO++;
-    }
     auto object = CS101_ASDU_getElement(asdu, 0);
     int singleIOA = InformationObject_getObjectAddress(object);
-    bool value = SinglePointInformation_getValue((SinglePointInformation) object);
+    bool newStatus = SinglePointInformation_getValue((SinglePointInformation) object);
 
-    auto List = relayStatus.keys();
+    if (_isUnderTest.load() || receivceSingleNO != testNO)
+    {
+      receivceSingleNO++;
+      if (relayStatus[singleIOA] == newStatus)
+      {
+        testFailedNO++;
+      }
+    }
 
-    relayStatus[singleIOA] = value;
-    qDebug() << "'    QMap relayStatus test' || IOA: " << singleIOA << " staus: " << value;
-    qDebug() << "     [" << relayStatus[singleIOA] << "]";
+    qDebug() << "'    QMap relayStatus test' || IOA: " << singleIOA << "new staus: " << newStatus;
+    qDebug() << "         Old status:[" << relayStatus[singleIOA] << "]";
 
-    emit receiveSinglePointStatus(singleIOA, value);
+    emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
+    relayStatus[singleIOA] = newStatus;
     if (_isUnderTest.load())
-      emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, value);
+    {
+      emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, newStatus);
+    }
 
     InformationObject_destroy(object);
   }
@@ -554,8 +557,10 @@ void IEC104Master::testTo10000(int testIoa, int receiveIoa)
 
 void IEC104Master::onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status)
 {
-  relayStatus[ioa] = status;
-  QThread::msleep(200);
-  testTo10000(testIOA, ioa);
+  QThread::msleep(100);
+  if (_isUnderTest.load())
+  {
+    testTo10000(testIOA, ioa);
+  }
 }
 

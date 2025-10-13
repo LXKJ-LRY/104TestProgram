@@ -73,7 +73,7 @@ signals:
   void connectionClosed(bool isEnabled);
 
   void receiveCot20(const QMap<int, bool> relayStatus);
-  void receiveSinglePointStatus(int ioa, bool isClose);
+  void receiveSinglePointStatus(int ioa, bool newStatus, int receiveNO = -1, int testNO = 0, int testFailedNO = 0);
 
   void underTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
 
@@ -107,6 +107,7 @@ private:
 
   int testNO = 0;
   int receivceSingleNO = 0;
+  int testFailedNO = 0;
 
   int testIOA = -1;
   int receiveIOA = -1;

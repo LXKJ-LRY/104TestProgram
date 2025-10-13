@@ -23,7 +23,7 @@ signals:
   void masterConnectionClosed(bool isEnabled);
 
   void masterReceiveCot20(const QMap<int, bool> relayStatus);
-  void masterReceiveSinglePointStatus(int ioa, bool isClose);
+  void masterReceiveSinglePointStatus(int ioa, bool newStatus, int receiveNO, int testNO, int testFaileNO);
 
 public slots:
   void onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort);

@@ -341,56 +341,82 @@ void MainWindow::onMasterReceiveCot20(const QMap<int, bool> relayStatus)
   ui->choose4CheckBox->setChecked(relayStatus[14]);
 }
 
-void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool isClose)
+void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int receiveNO, int testNO, int testFailedNO)
 {
+
+  ui->testCounterLabel->setText(QString("测试次数: [%1]--收到结果: [%2]--失败次数: [%3]").arg(testNO).arg(receiveNO).arg(testFailedNO));
   switch (ioa)
   {
   case 2:
-    if (isClose)
+    if (relayStatus[ioa] == newStatus)
     {
-      ui->relayStatusLabel->setText(tr("1#relay: close"));
-      ui->TestBrowser->append(tr("1#relay: close\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 -- test failed -- 1#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      ui->TestBrowser->append(QString("NO.%1 -- test failed -- 1#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      break;
+    }
+    if (newStatus)
+    {
+      ui->relayStatusLabel->setText(QString("NO.%1 - 1#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 1#relay: close || old status: open").arg(receiveNO));
     }
     else
     {
-      ui->relayStatusLabel->setText(tr("1#relay: open"));
-      ui->TestBrowser->append(tr("1#relay: open\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 - 1#relay: open || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 1#relay: open || old status: close").arg(receiveNO));
     }
     break;
   case 6:
-    if (isClose)
+    if (relayStatus[ioa] == newStatus)
     {
-      ui->relayStatusLabel->setText(tr("2#relay: close"));
-      ui->TestBrowser->append(tr("2#relay: close\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 -- test failed -- 2#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      ui->TestBrowser->append(QString("NO.%1 -- test failed -- 2#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      break;
+    }
+    if (newStatus)
+    {
+      ui->relayStatusLabel->setText(QString("NO.%1 - 2#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 2#relay: close || old status: open").arg(receiveNO));
     }
     else
     {
-      ui->relayStatusLabel->setText(tr("2#relay: open"));
-      ui->TestBrowser->append(tr("2#relay: open\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 - 2#relay: open || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 2#relay: open || old status: close").arg(receiveNO));
     }
     break;
   case 10:
-    if (isClose)
+    if (relayStatus[ioa] == newStatus)
     {
-      ui->relayStatusLabel->setText(tr("3#relay: close"));
-      ui->TestBrowser->append(tr("3#relay: close\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 -- test failed -- 3#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      ui->TestBrowser->append(QString("NO.%1 -- test failed -- 3#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      break;
+    }
+    if (newStatus)
+    {
+      ui->relayStatusLabel->setText(QString("NO.%1 - 3#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 3#relay: close || old status: open").arg(receiveNO));
     }
     else
     {
-      ui->relayStatusLabel->setText(tr("3#relay: open"));
-      ui->TestBrowser->append(tr("3#relay: open\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 - 3#relay: open || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 3#relay: open || old status: close").arg(receiveNO));
     }
     break;
   case 14:
-    if (isClose)
+    if (relayStatus[ioa] == newStatus)
     {
-      ui->relayStatusLabel->setText(tr("4#relay: close"));
-      ui->TestBrowser->append(tr("4#relay: close\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 -- test failed -- 4#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      ui->TestBrowser->append(QString("NO.%1 -- test failed -- 4#relay: expected status: %2").arg(receiveNO).arg(newStatus));
+      break;
+    }
+    if (newStatus)
+    {
+      ui->relayStatusLabel->setText(QString("NO.%1 - 4#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 4#relay: close || old status: open").arg(receiveNO));
     }
     else
     {
-      ui->relayStatusLabel->setText(tr("4#relay: open"));
-      ui->TestBrowser->append(tr("4#relay: open\n"));
+      ui->relayStatusLabel->setText(QString("NO.%1 - 4#relay: open || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(QString("NO.%1 - 4#relay: open || old status: close").arg(receiveNO));
     }
     break;
   default:
@@ -398,7 +424,7 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool isClose)
     break;
   }
 
-  relayStatus[ioa] = isClose;
+  relayStatus[ioa] = newStatus;
 }
 
 void MainWindow::onChoose1CheckBoxClicked()
