@@ -53,6 +53,9 @@ signals:
   void sendChoosedRelayYKClose(int ioa);
   void sendChoosedRelayYKOpen(int ioa);
 
+  void startTest(int ioa);
+  void stopTest(int ioa);
+
 private slots:
   void onSettingPageButtonClicked();
   void onTestPageButtonClicked();
@@ -85,6 +88,14 @@ private slots:
   void onChoose3CheckBoxClicked();
   void onChoose4CheckBoxClicked();
 
+  void onTest1CheckBoxClicked();
+  void onTest2CheckBoxClicked();
+  void onTest3CheckBoxClicked();
+  void onTest4CheckBoxClicked();
+
+  void onStartTestButtonClicked();
+  void onStopTestButtonClicked();
+
 private:
   void initialize();
   void initialEdits();
@@ -106,6 +117,10 @@ private:
 
   QValidator* _ipValidator = nullptr;
   QValidator* _portValidator = nullptr;
+
+  QMap<int, bool> relayStatus;
+
+  int TestIOA = -1;
 
   int settingComboCurrentIndex = 0;
   int settingComboLastIndex = -1;

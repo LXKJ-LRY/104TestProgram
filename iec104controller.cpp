@@ -67,3 +67,13 @@ void Iec104Controller::onSendChoosedRelayYKOpen(int ioa)
 {
   master->sendChoosedYKOpen(ioa);
 }
+
+void Iec104Controller::onStartTest(int ioa)
+{
+  master->startTestTo10000(ioa);
+}
+
+void Iec104Controller::onStopTest(int ioa)
+{
+  master->stopTestTo10000(ioa);
+}

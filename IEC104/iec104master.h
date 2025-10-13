@@ -37,8 +37,13 @@ public:
   bool sendChoosedYKOpen(int ioa);
   bool sendChoosedYKClose(int ioa);
 
+  bool sendTestYK(int ioa, bool status);
+
   void onConnectButtonClicked();
   void onDisconnectButtonClicked();
+
+  void startTestTo10000(int ioa);
+  void stopTestTo10000(int ioa);
 
 private:
   void setupTimers();
@@ -60,6 +65,9 @@ private:
   // TYPE: 43
   void handleRecvRequestCheckOperationTicket(CS101_ASDU asdu);
 
+  void testTo10000(int testIoa, int receiveIoa);
+
+
 signals:
   void connectionEstablished(bool isEnabled);
   void connectionClosed(bool isEnabled);
@@ -67,9 +75,14 @@ signals:
   void receiveCot20(const QMap<int, bool> relayStatus);
   void receiveSinglePointStatus(int ioa, bool isClose);
 
+  void underTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
+
+
 private slots:
   void onReconnectTimerTriggered();
   void onInterrogationTimerTriggered();
+
+  void onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
 
 private:
   QMap<int, bool> relayStatus;
@@ -91,6 +104,12 @@ private:
   int localPort;
   QString remoteAddr;
   int remotePort;
+
+  int testNO = 0;
+  int receivceSingleNO = 0;
+
+  int testIOA = -1;
+  int receiveIOA = -1;
 
 };
 

@@ -36,6 +36,9 @@ public slots:
   void onSendChoosedRelayYKClose(int ioa);
   void onSendChoosedRelayYKOpen(int ioa);
 
+  void onStartTest(int ioa);
+  void onStopTest(int ioa);
+
 private:
   explicit Iec104Controller(QObject *parent = nullptr);
   Iec104Controller(const Iec104Controller&) {}

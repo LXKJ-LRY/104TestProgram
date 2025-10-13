@@ -6,6 +6,12 @@ IEC104Master::IEC104Master(QObject *parent)
   _strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
   qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
 
+  connect(this, &IEC104Master::underTestReceiveSinglePoint, this, &IEC104Master::onUnderTestReceiveSinglePoint);
+
+  _isEnabled.store(false);
+  _isConnected.store(false);
+  _isUnderTest.store(false);
+
   setupTimers();
 }
 
@@ -347,6 +353,29 @@ bool IEC104Master::sendChoosedYKClose(int ioa)
   return true;
 }
 
+bool IEC104Master::sendTestYK(int ioa, bool status)
+{
+  if (_con == nullptr)
+  {
+    qDebug() << "   no create connection";
+    return false;
+  }
+
+  if (!_isConnected.load())
+  {
+    qDebug() << "   connection closed";
+    return false;
+  }
+
+  InformationObject YKRelay = (InformationObject)SingleCommand_create(NULL, ioa, status, false, 0);
+  if (CS104_Connection_sendProcessCommandEx(_con, CS101_COT_ACTIVATION, 1, YKRelay) == false)
+  {
+    qDebug() << "IEC104 Master: Send Close Relay failed.";
+    return false;
+  }
+  return true;
+}
+
 void IEC104Master::handleConnectionOpened()
 {
   _isConnected.store(true);
@@ -421,16 +450,23 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
   }
   else if (cot == 3)
   {
+    if (_isUnderTest.load())
+    {
+      receivceSingleNO++;
+    }
     auto object = CS101_ASDU_getElement(asdu, 0);
+    int singleIOA = InformationObject_getObjectAddress(object);
+    bool value = SinglePointInformation_getValue((SinglePointInformation) object);
 
-    qDebug() << QString("  -IOA: %1 value: %2 ").arg(
-                        InformationObject_getObjectAddress(object)).arg(
-                        SinglePointInformation_getValue((SinglePointInformation) object));
+    auto List = relayStatus.keys();
 
-    relayStatus[InformationObject_getObjectAddress(object)] = SinglePointInformation_getValue((SinglePointInformation) object);
-    qDebug() << "'    QMap relayStatus test' || IOA: " << \
-        InformationObject_getObjectAddress(object) << " sta"\
-        "us: " << SinglePointInformation_getValue((SinglePointInformation) object);
+    relayStatus[singleIOA] = value;
+    qDebug() << "'    QMap relayStatus test' || IOA: " << singleIOA << " staus: " << value;
+    qDebug() << "     [" << relayStatus[singleIOA] << "]";
+
+    emit receiveSinglePointStatus(singleIOA, value);
+    if (_isUnderTest.load())
+      emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, value);
 
     InformationObject_destroy(object);
   }
@@ -452,4 +488,74 @@ void IEC104Master::onDisconnectButtonClicked()
   _isEnabled.store(false);
 }
 
+void IEC104Master::startTestTo10000(int ioa)
+{
+  if (_isUnderTest.load() || ioa == -1) return;
+
+  testIOA = ioa;
+  switch(ioa)
+  {
+  case 0x6001:
+    receiveIOA = 2;
+    break;
+  case 0x6002:
+    receiveIOA = 6;
+    break;
+  case 0x6003:
+    receiveIOA = 10;
+    break;
+  case 0x6004:
+    receiveIOA = 14;
+    break;
+  default:
+    receiveIOA = -1;
+    break;
+  }
+
+  _isUnderTest.store(true);
+
+  qDebug() << "--------start test: " << ioa;
+
+  testTo10000(testIOA, receiveIOA);
+}
+
+void IEC104Master::stopTestTo10000(int ioa)
+{
+  if (!_isUnderTest.load()) return;
+
+  _isUnderTest.store(false);
+
+  qDebug() << "--------stop test: " << ioa;
+}
+
+
+void IEC104Master::testTo10000(int testIoa, int receiveIoa)
+{
+  if (testNO == 10000)
+  {
+    testNO = 0;
+    receivceSingleNO = 0;
+    stopTestTo10000(testIOA);
+    return;
+  }
+  testNO++;
+  qDebug() << "--------testNO: " << testNO;
+  if (sendTestYK(testIoa, !relayStatus[receiveIoa]))
+  {
+
+  }
+  else
+  {
+
+  }
+
+}
+
+
+void IEC104Master::onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status)
+{
+  relayStatus[ioa] = status;
+  QThread::msleep(200);
+  testTo10000(testIOA, ioa);
+}
 

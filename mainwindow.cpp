@@ -110,10 +110,13 @@ void MainWindow::setupOtherConnections()
   connect(this, &MainWindow::sendChoosedRelayYKOpen, _104Controller, &Iec104Controller::onSendChoosedRelayYKOpen, Qt::QueuedConnection);
   connect(this, &MainWindow::sendChoosedRelayYKClose, _104Controller, &Iec104Controller::onSendChoosedRelayYKClose, Qt::QueuedConnection);
 
-  connect(_104Controller, &Iec104Controller::masterEstablishConnection, this, &MainWindow::onConnectionEstablished);
-  connect(_104Controller, &Iec104Controller::masterConnectionClosed, this, &MainWindow::onConnectionClosed);
+  connect(_104Controller, &Iec104Controller::masterEstablishConnection, this, &MainWindow::onConnectionEstablished, Qt::QueuedConnection);
+  connect(_104Controller, &Iec104Controller::masterConnectionClosed, this, &MainWindow::onConnectionClosed, Qt::QueuedConnection);
   connect(_104Controller, &Iec104Controller::masterReceiveCot20, this, &MainWindow::onMasterReceiveCot20, Qt::QueuedConnection);
   connect(_104Controller, &Iec104Controller::masterReceiveSinglePointStatus, this, &MainWindow::onMasterReceiveSinglePointStatus, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::startTest, _104Controller, &Iec104Controller::onStartTest, Qt::QueuedConnection);
+  connect(this, &MainWindow::stopTest, _104Controller, &Iec104Controller::onStopTest);
 }
 
 void MainWindow::setupSelfConnections()
@@ -134,6 +137,14 @@ void MainWindow::setupSelfConnections()
   connect(ui->choose2CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose2CheckBoxClicked);
   connect(ui->choose3CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose3CheckBoxClicked);
   connect(ui->choose4CheckBox, &QAbstractButton::clicked, this, &MainWindow::onChoose4CheckBoxClicked);
+
+  connect(ui->test1CheckBox, &QAbstractButton::clicked, this, &MainWindow::onTest1CheckBoxClicked);
+  connect(ui->test2CheckBox, &QAbstractButton::clicked, this, &MainWindow::onTest2CheckBoxClicked);
+  connect(ui->test3CheckBox, &QAbstractButton::clicked, this, &MainWindow::onTest3CheckBoxClicked);
+  connect(ui->test4CheckBox, &QAbstractButton::clicked, this, &MainWindow::onTest4CheckBoxClicked);
+
+  connect(ui->startTestButton, &QAbstractButton::clicked, this, &MainWindow::onStartTestButtonClicked);
+  connect(ui->stopTestButton, &QAbstractButton::clicked, this, &MainWindow::onStopTestButtonClicked);
 }
 
 
@@ -323,6 +334,7 @@ void MainWindow::onConnectionClosed(bool isEnabled)
 
 void MainWindow::onMasterReceiveCot20(const QMap<int, bool> relayStatus)
 {
+  this->relayStatus = relayStatus;
   ui->choose1CheckBox->setChecked(relayStatus[2]);
   ui->choose2CheckBox->setChecked(relayStatus[6]);
   ui->choose3CheckBox->setChecked(relayStatus[10]);
@@ -334,21 +346,59 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool isClose)
   switch (ioa)
   {
   case 2:
-
+    if (isClose)
+    {
+      ui->relayStatusLabel->setText(tr("1#relay: close"));
+      ui->TestBrowser->append(tr("1#relay: close\n"));
+    }
+    else
+    {
+      ui->relayStatusLabel->setText(tr("1#relay: open"));
+      ui->TestBrowser->append(tr("1#relay: open\n"));
+    }
     break;
   case 6:
-
+    if (isClose)
+    {
+      ui->relayStatusLabel->setText(tr("2#relay: close"));
+      ui->TestBrowser->append(tr("2#relay: close\n"));
+    }
+    else
+    {
+      ui->relayStatusLabel->setText(tr("2#relay: open"));
+      ui->TestBrowser->append(tr("2#relay: open\n"));
+    }
     break;
   case 10:
-
+    if (isClose)
+    {
+      ui->relayStatusLabel->setText(tr("3#relay: close"));
+      ui->TestBrowser->append(tr("3#relay: close\n"));
+    }
+    else
+    {
+      ui->relayStatusLabel->setText(tr("3#relay: open"));
+      ui->TestBrowser->append(tr("3#relay: open\n"));
+    }
     break;
   case 14:
-
+    if (isClose)
+    {
+      ui->relayStatusLabel->setText(tr("4#relay: close"));
+      ui->TestBrowser->append(tr("4#relay: close\n"));
+    }
+    else
+    {
+      ui->relayStatusLabel->setText(tr("4#relay: open"));
+      ui->TestBrowser->append(tr("4#relay: open\n"));
+    }
     break;
   default:
     qDebug() << "没有收到单点数据";
     break;
   }
+
+  relayStatus[ioa] = isClose;
 }
 
 void MainWindow::onChoose1CheckBoxClicked()
@@ -407,6 +457,88 @@ void MainWindow::onChoose4CheckBoxClicked()
     ui->test4CheckBox->setEnabled(true);
     emit sendChoosedRelayYKOpen(0x6004);
   }
+}
+
+void MainWindow::onTest1CheckBoxClicked()
+{
+  if (ui->test1CheckBox->isChecked())
+  {
+    TestIOA = 0x6001;
+    ui->test2CheckBox->setEnabled(false);
+    ui->test3CheckBox->setEnabled(false);
+    ui->test4CheckBox->setEnabled(false);
+  }
+  else
+  {
+    TestIOA = -1;
+    ui->test2CheckBox->setEnabled(true);
+    ui->test3CheckBox->setEnabled(true);
+    ui->test4CheckBox->setEnabled(true);
+  }
+}
+
+void MainWindow::onTest2CheckBoxClicked()
+{
+  if (ui->test2CheckBox->isChecked())
+  {
+    TestIOA = 0x6002;
+    ui->test1CheckBox->setEnabled(false);
+    ui->test3CheckBox->setEnabled(false);
+    ui->test4CheckBox->setEnabled(false);
+  }
+  else
+  {
+    TestIOA = -1;
+    ui->test1CheckBox->setEnabled(true);
+    ui->test3CheckBox->setEnabled(true);
+    ui->test4CheckBox->setEnabled(true);
+  }
+}
+
+void MainWindow::onTest3CheckBoxClicked()
+{
+  if (ui->test3CheckBox->isChecked())
+  {
+    TestIOA = 0x6003;
+    ui->test2CheckBox->setEnabled(false);
+    ui->test1CheckBox->setEnabled(false);
+    ui->test4CheckBox->setEnabled(false);
+  }
+  else
+  {
+    TestIOA = -1;
+    ui->test2CheckBox->setEnabled(true);
+    ui->test1CheckBox->setEnabled(true);
+    ui->test4CheckBox->setEnabled(true);
+  }
+}
+
+void MainWindow::onTest4CheckBoxClicked()
+{
+  if (ui->test4CheckBox->isChecked())
+  {
+    TestIOA = 0x6004;
+    ui->test2CheckBox->setEnabled(false);
+    ui->test3CheckBox->setEnabled(false);
+    ui->test1CheckBox->setEnabled(false);
+  }
+  else
+  {
+    TestIOA = -1;
+    ui->test2CheckBox->setEnabled(true);
+    ui->test3CheckBox->setEnabled(true);
+    ui->test1CheckBox->setEnabled(true);
+  }
+}
+
+void MainWindow::onStartTestButtonClicked()
+{
+  emit startTest(TestIOA);
+}
+
+void MainWindow::onStopTestButtonClicked()
+{
+  emit stopTest(TestIOA);
 }
 
 
