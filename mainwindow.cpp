@@ -298,7 +298,8 @@ void MainWindow::onQuerySettingsNameFinished(QList<QString> settingsNameList)
 
 void MainWindow::onConnectButtonClicked()
 {
-  if (ui->localMasterAddrEdit->text().isEmpty() || ui->localPortEdit->text().isEmpty() || ui->remoteSlaveAddrEdit->text().isEmpty() || ui->remotePortEdit->text().isEmpty() )
+  if (ui->localMasterAddrEdit->text().isEmpty() || ui->localPortEdit->text().isEmpty()
+      || ui->remoteSlaveAddrEdit->text().isEmpty() || ui->remotePortEdit->text().isEmpty() )
   {
     QMessageBox::warning(this, "connect failed", "Host / Port is empty");
     return;
@@ -307,7 +308,8 @@ void MainWindow::onConnectButtonClicked()
 
   ui->connectionSettingNameLabel->setText("连接配置: " + ui->nameEdit->text());
   qDebug() << "hello1";
-  emit connectButtonClicked(ui->localMasterAddrEdit->text(), ui->localPortEdit->text().toInt(), ui->remoteSlaveAddrEdit->text(), ui->remotePortEdit->text().toInt());
+  emit connectButtonClicked(ui->localMasterAddrEdit->text(), ui->localPortEdit->text().toInt(),
+                            ui->remoteSlaveAddrEdit->text(), ui->remotePortEdit->text().toInt());
 }
 
 void MainWindow::onDisconnectButtonClicked()
