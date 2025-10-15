@@ -315,7 +315,7 @@ void MainWindow::onConnectButtonClicked()
 void MainWindow::onDisconnectButtonClicked()
 {
   enableEditAndButton(true);
-  //ui->connectionSettingNameLabel->setText("停止服务");
+  ui->connectionSettingNameLabel->setText("停止服务");
   emit disconnectbuttonClicked();
 }
 
