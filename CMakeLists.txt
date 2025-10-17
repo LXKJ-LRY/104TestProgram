@@ -12,6 +12,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql Network)
 
+if(UNIX) #ubuntu20.04 needed
+    find_package(Threads REQUIRED)
+endif()
+
 set(TS_FILES testProgram_zh_CN.ts)
 
 set(Libiec60870Path ${CMAKE_CURRENT_SOURCE_DIR}/libiec60870)
@@ -74,6 +78,10 @@ target_link_libraries(testProgram PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(testProgram PRIVATE Qt5::Sql)
 target_link_libraries(testProgram PRIVATE Qt5::Core)
 target_link_libraries(testProgram PRIVATE lib60870)
+
+if(UNIX)
+    target_link_libraries(testProgram PRIVATE Threads::Threads)
+endif()
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
