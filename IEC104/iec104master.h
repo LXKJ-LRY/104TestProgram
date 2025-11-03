@@ -79,6 +79,8 @@ signals:
 
   void underTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
 
+  void initialTestRelay();
+
 
 private slots:
   void onReconnectTimerTriggered();
@@ -86,6 +88,8 @@ private slots:
 
   void onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
   void initialRelaysAfterStopTest();
+
+  void initialTestRelayAfterStop();
 
 private:
   QMap<int, bool> relayStatus;
@@ -102,6 +106,8 @@ private:
 
   std::atomic_bool _isUnderTest;
 
+  std::atomic_bool _isInitializeAfterStop;
+
   // Strategy
   //std::shared_ptr<IEC104MasterStrategy> _strategy;
 
@@ -114,6 +120,7 @@ private:
   int receivceSingleNO = 0;
   int testFailedNO = 0;
 
+  int closedRelayIOA = -1;
   int testIOA = -1;
   int receiveIOA = -1;
 
