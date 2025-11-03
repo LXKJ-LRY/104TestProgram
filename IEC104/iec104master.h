@@ -4,8 +4,8 @@
 #include "lib60870/cs104_connection.h"
 #include "lib60870/hal_time.h"
 #include "lib60870/hal_thread.h"
-#include "iec104masterstrategy.h"
-#include "iec104masterstrategyfactory.h"
+// #include "iec104masterstrategy.h"
+// #include "iec104masterstrategyfactory.h"
 
 #include <QObject>
 #include <QTimer>
@@ -45,6 +45,8 @@ public:
   void startTestTo10000(int ioa);
   void stopTestTo10000(int ioa);
 
+  void setNewTestNumber(int newTestNumber);
+
 private:
   void setupTimers();
 
@@ -77,17 +79,24 @@ signals:
 
   void underTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
 
+  void initialTestRelay();
+
 
 private slots:
   void onReconnectTimerTriggered();
   void onInterrogationTimerTriggered();
 
   void onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
+  void initialRelaysAfterStopTest();
+
+  void initialTestRelayAfterStop();
 
 private:
   QMap<int, bool> relayStatus;
   QTimer* _reconnectTimer = nullptr;
   QTimer* _interrogationTimer = nullptr;
+  QTimer* _closeRelayAfterStopTest =nullptr;
+
 
   CS104_Connection _con = nullptr;
 
@@ -97,8 +106,10 @@ private:
 
   std::atomic_bool _isUnderTest;
 
+  std::atomic_bool _isInitializeAfterStop;
+
   // Strategy
-  std::shared_ptr<IEC104MasterStrategy> _strategy;
+  //std::shared_ptr<IEC104MasterStrategy> _strategy;
 
   QString localAddr;
   int localPort;
@@ -109,8 +120,11 @@ private:
   int receivceSingleNO = 0;
   int testFailedNO = 0;
 
+  int closedRelayIOA = -1;
   int testIOA = -1;
   int receiveIOA = -1;
+
+  std::atomic_int testNumber;
 
 };
 

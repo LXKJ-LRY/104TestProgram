@@ -3,14 +3,18 @@
 IEC104Master::IEC104Master(QObject *parent)
     : QObject{parent}
 {
-  _strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
+  //_strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
   qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
 
   connect(this, &IEC104Master::underTestReceiveSinglePoint, this, &IEC104Master::onUnderTestReceiveSinglePoint);
+  connect(this, &IEC104Master::initialTestRelay, this, &IEC104Master::initialTestRelayAfterStop);
 
   _isEnabled.store(false);
   _isConnected.store(false);
   _isUnderTest.store(false);
+  _isInitializeAfterStop.store(false);
+
+  testNumber.store(10000);
 
   setupTimers();
 }
@@ -28,6 +32,11 @@ void IEC104Master::setupTimers()
   _interrogationTimer->setSingleShot(true);
   connect(_interrogationTimer, &QTimer::timeout,
           this, &IEC104Master::onInterrogationTimerTriggered);
+
+  _closeRelayAfterStopTest = new QTimer(this);
+  _closeRelayAfterStopTest->setInterval(2000);
+  _closeRelayAfterStopTest->setSingleShot(true);
+  connect(_closeRelayAfterStopTest, &QTimer::timeout, this, &IEC104Master::sendInterrogation);
 }
 
 
@@ -43,7 +52,7 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
   this->remoteAddr = remoteAddr;
   this->remotePort = remotePort;
   // stop old connection before start
-  qDebug() << "hello4";
+
   if (_con)
   {
     if (stop() == false)
@@ -79,12 +88,10 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
 
 bool IEC104Master::stop()
 {
-  qDebug() << "stop2";
   if (_con)
   {
     CS104_Connection_destroy(_con);
     _con = nullptr;
-    qDebug() << "stop3";
   }
 
   if (_interrogationTimer && _interrogationTimer->isActive())
@@ -96,7 +103,11 @@ bool IEC104Master::stop()
   {
     _reconnectTimer->stop();
   }
-  qDebug() << "stop4";
+
+  if (_closeRelayAfterStopTest && _closeRelayAfterStopTest->isActive())
+  {
+    _closeRelayAfterStopTest->stop();
+  }
 
   return true;
 }
@@ -120,7 +131,7 @@ void IEC104Master::connectionHandler(void* parameter, CS104_Connection connectio
     break;
 
   case CS104_CONNECTION_STARTDT_CON_RECEIVED:
-    qDebug() << "send interrogation 发送总召";
+    qDebug() << "send interrogation\n";
     pThis->sendInterrogation();
     break;
 
@@ -210,8 +221,8 @@ bool IEC104Master::asduReceivedHandler(void* parameter, int address, CS101_ASDU 
 
       auto object = CS101_ASDU_getElement(asdu, i);
 
-      qDebug() << QString("---IOA: %1 cot: %2 asduType: %3").arg(
-                          InformationObject_getObjectAddress(object)).arg(cot).arg(asduType);
+      // qDebug() << QString("---IOA: %1 cot: %2 asduType: %3").arg(
+      //                     InformationObject_getObjectAddress(object)).arg(cot).arg(asduType);
 
       InformationObject_destroy(object);
     }
@@ -330,6 +341,7 @@ bool IEC104Master::sendChoosedYKOpen(int ioa)
 
 bool IEC104Master::sendChoosedYKClose(int ioa)
 {
+  closedRelayIOA = ioa;
   if (_con == nullptr)
   {
     qDebug() << "   no create connection";
@@ -383,6 +395,10 @@ void IEC104Master::handleConnectionOpened()
 void IEC104Master::handleConnectionClosed()
 {
   _isConnected.store(false);
+  if (_isUnderTest.load())
+  {
+    _isUnderTest.store(false);
+  }
   emit connectionClosed(_isEnabled.load());
   QMetaObject::invokeMethod(this, [this]()
                             {
@@ -452,23 +468,36 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
     int singleIOA = InformationObject_getObjectAddress(object);
     bool newStatus = SinglePointInformation_getValue((SinglePointInformation) object);
 
-    if (_isUnderTest.load() || receivceSingleNO != testNO)
-    {
-      receivceSingleNO++;
-      if (relayStatus[singleIOA] == newStatus)
-      {
-        testFailedNO++;
-      }
-    }
-
-    qDebug() << "'    QMap relayStatus test' || IOA: " << singleIOA << "new staus: " << newStatus;
-    qDebug() << "         Old status:[" << relayStatus[singleIOA] << "]";
-
-    emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
-    relayStatus[singleIOA] = newStatus;
     if (_isUnderTest.load())
     {
-      emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, newStatus);
+      if (_isUnderTest.load() || receivceSingleNO != testNO)
+      {
+
+        receivceSingleNO++;
+
+        if (relayStatus[singleIOA] == newStatus)
+        {
+          testFailedNO++;
+        }
+        emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
+      }
+
+      qDebug() << "'    QMap relayStatus test' || IOA: " << singleIOA << "new staus: " << newStatus;
+      qDebug() << "         Old status:[" << relayStatus[singleIOA] << "]";
+
+      //emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
+      relayStatus[singleIOA] = newStatus;
+      if (_isUnderTest.load())
+      {
+        emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, newStatus);
+      }
+    }
+    else if (_isInitializeAfterStop.load())
+    {
+      emit initialTestRelay();
+
+
+
     }
 
     InformationObject_destroy(object);
@@ -532,23 +561,35 @@ void IEC104Master::startTestTo10000(int ioa)
 
 void IEC104Master::stopTestTo10000(int ioa)
 {
+  _isInitializeAfterStop.store(true);
+  //_closeRelayAfterStopTest->start();
+
   if (!_isUnderTest.load()) return;
 
   _isUnderTest.store(false);
 
   qDebug() << "--------stop test: " << ioa;
+
+  initialRelaysAfterStopTest();
+
+}
+
+void IEC104Master::setNewTestNumber(int newTestNumber)
+{
+  testNumber.store(newTestNumber);
 }
 
 
 void IEC104Master::testTo10000(int testIoa, int receiveIoa)
 {
-  if (testNO == 10000)
+  if (testNO == testNumber.load())
   {
     testNO = 0;
     receivceSingleNO = 0;
     stopTestTo10000(testIOA);
     return;
   }
+
   testNO++;
   qDebug() << "--------testNO: " << testNO;
   if (sendTestYK(testIoa, !relayStatus[receiveIoa]))
@@ -563,6 +604,7 @@ void IEC104Master::testTo10000(int testIoa, int receiveIoa)
 }
 
 
+
 void IEC104Master::onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status)
 {
   QThread::msleep(100);
@@ -570,5 +612,18 @@ void IEC104Master::onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool st
   {
     testTo10000(testIOA, ioa);
   }
+}
+
+void IEC104Master::initialRelaysAfterStopTest()
+{
+  sendChoosedYKOpen(closedRelayIOA);
+
+  // sendInterrogation();
+}
+
+void IEC104Master::initialTestRelayAfterStop()
+{
+  sendChoosedYKOpen(testIOA);
+  _closeRelayAfterStopTest->start();
 }
 
