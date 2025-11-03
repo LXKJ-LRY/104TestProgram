@@ -3,7 +3,7 @@
 IEC104Master::IEC104Master(QObject *parent)
     : QObject{parent}
 {
-  _strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
+  //_strategy = IEC104MasterStrategyFactory::getStrategy(IEC104MasterStrategyFactory::eRemoteControlLock);
   qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
 
   connect(this, &IEC104Master::underTestReceiveSinglePoint, this, &IEC104Master::onUnderTestReceiveSinglePoint);
@@ -11,6 +11,8 @@ IEC104Master::IEC104Master(QObject *parent)
   _isEnabled.store(false);
   _isConnected.store(false);
   _isUnderTest.store(false);
+
+  testNumber.store(10000);
 
   setupTimers();
 }
@@ -49,7 +51,7 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
   this->remoteAddr = remoteAddr;
   this->remotePort = remotePort;
   // stop old connection before start
-  qDebug() << "hello4";
+
   if (_con)
   {
     if (stop() == false)
@@ -85,12 +87,10 @@ void IEC104Master::start(QString localAddr, int localPort, QString remoteAddr, i
 
 bool IEC104Master::stop()
 {
-  qDebug() << "stop2";
   if (_con)
   {
     CS104_Connection_destroy(_con);
     _con = nullptr;
-    qDebug() << "stop3";
   }
 
   if (_interrogationTimer && _interrogationTimer->isActive())
@@ -102,7 +102,6 @@ bool IEC104Master::stop()
   {
     _reconnectTimer->stop();
   }
-  qDebug() << "stop4";
 
   if (_closeRelayAfterStopTest && _closeRelayAfterStopTest->isActive())
   {
@@ -131,7 +130,7 @@ void IEC104Master::connectionHandler(void* parameter, CS104_Connection connectio
     break;
 
   case CS104_CONNECTION_STARTDT_CON_RECEIVED:
-    qDebug() << "send interrogation 发送总召";
+    qDebug() << "send interrogation\n";
     pThis->sendInterrogation();
     break;
 
@@ -469,17 +468,20 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
 
     if (_isUnderTest.load() || receivceSingleNO != testNO)
     {
+
       receivceSingleNO++;
+
       if (relayStatus[singleIOA] == newStatus)
       {
         testFailedNO++;
       }
+      emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
     }
 
     qDebug() << "'    QMap relayStatus test' || IOA: " << singleIOA << "new staus: " << newStatus;
     qDebug() << "         Old status:[" << relayStatus[singleIOA] << "]";
 
-    emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
+    //emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
     relayStatus[singleIOA] = newStatus;
     if (_isUnderTest.load())
     {
@@ -552,20 +554,28 @@ void IEC104Master::stopTestTo10000(int ioa)
 
   _isUnderTest.store(false);
 
+
+
   qDebug() << "--------stop test: " << ioa;
 
+}
+
+void IEC104Master::setNewTestNumber(int newTestNumber)
+{
+  testNumber.store(newTestNumber);
 }
 
 
 void IEC104Master::testTo10000(int testIoa, int receiveIoa)
 {
-  if (testNO == 300)
+  if (testNO == testNumber.load())
   {
     testNO = 0;
     receivceSingleNO = 0;
     stopTestTo10000(testIOA);
     return;
   }
+
   testNO++;
   qDebug() << "--------testNO: " << testNO;
   if (sendTestYK(testIoa, !relayStatus[receiveIoa]))

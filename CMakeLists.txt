@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(testProgram VERSION 0.1 LANGUAGES CXX)
+project(testProgram VERSION 0.3 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -17,6 +17,10 @@ if(UNIX) #ubuntu20.04 needed
 endif()
 
 set(TS_FILES testProgram_zh_CN.ts)
+set(TRANSLATION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}  # 主目录
+    ${CMAKE_CURRENT_SOURCE_DIR}/IEC104  # 子目录（如有）
+)
 
 set(Libiec60870Path ${CMAKE_CURRENT_SOURCE_DIR}/libiec60870)
 include_directories(${Libiec60870Path}/include)
@@ -50,18 +54,21 @@ else()
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         find_package(Qt5 REQUIRED COMPONENTS Widgets)
+        find_package(Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
         add_executable(testProgram
             ${PROJECT_SOURCES}
+            ${QM_FILES}
             dbdatahandler.h dbdatahandler.cpp
-            settingManager/settingmanager.h settingManager/settingmanager.cpp
+
             iec104controller.h iec104controller.cpp
             IEC104/iec104master.h IEC104/iec104master.cpp
-            IEC104/iec104masterstrategy.h
-            IEC104/remotecontrollockmasterstrategy.h IEC104/remotecontrollockmasterstrategy.cpp
-            IEC104/iec104masterstrategyfactory.h IEC104/iec104masterstrategyfactory.cpp
-            devicepointdialog.h devicepointdialog.cpp devicepointdialog.ui
+            testlogmanager.h testlogmanager.cpp
+            # IEC104/iec104masterstrategy.h
+            # IEC104/remotecontrollockmasterstrategy.h IEC104/remotecontrollockmasterstrategy.cpp
+            # IEC104/iec104masterstrategyfactory.h IEC104/iec104masterstrategyfactory.cpp
+
 
 
 
@@ -72,6 +79,8 @@ find_package(Qt5 REQUIRED COMPONENTS Core)
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
+message(STATUS "QM_FILES: ${QM_FILES}")
+
 target_link_libraries(testProgram PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(testProgram PRIVATE Qt5::Widgets)
 target_link_libraries(testProgram PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
@@ -81,7 +90,16 @@ target_link_libraries(testProgram PRIVATE lib60870)
 
 if(UNIX)
     target_link_libraries(testProgram PRIVATE Threads::Threads)
+target_link_libraries(testProgram PRIVATE Qt5::Core)
 endif()
+
+add_custom_target(translations ALL
+    DEPENDS ${QM_FILES}
+    COMMENT "Generating translation files to ${QM_OUTPUT_DIR}"
+)
+
+
+add_dependencies(testProgram translations)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
