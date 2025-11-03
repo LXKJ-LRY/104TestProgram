@@ -3,6 +3,7 @@
 
 #include "dbdatahandler.h"
 #include "iec104controller.h"
+#include "testlogmanager.h"
 
 #include <QMainWindow>
 #include <QSettings>
@@ -57,6 +58,8 @@ signals:
 
   void notifySetTestNumber(int defaultNumber = 10000);
 
+  void appendTestLogToFile(QString text);
+
 private slots:
   void onSettingPageButtonClicked();
   void onTestPageButtonClicked();
@@ -110,6 +113,8 @@ private:
   Ui::MainWindow *ui;
   QSettings* _setting;
 
+  TestLogManager* _logManager = nullptr;
+  QThread* _logThread = nullptr;
 
   DBDataHandler* _dbDataHandler = nullptr;
   QThread* _dbThread = nullptr;

@@ -30,12 +30,21 @@ MainWindow::~MainWindow()
     _104Thread->wait();
   }
   _104Controller->release();
+
   if (_dbThread != nullptr)
   {
     _dbThread->quit();
     _dbThread->wait();
   }
   _dbDataHandler->release();
+
+  if (_logThread != nullptr)
+  {
+    _logThread->quit();
+    _logThread->wait();
+  }
+  _logManager->release();
+
   delete ui;
 }
 
@@ -55,6 +64,11 @@ void MainWindow::initialize()
   _104Controller = Iec104Controller::instance();
   _104Controller->moveToThread(_104Thread);
   _104Thread->start();
+
+  _logThread = new QThread(this);
+  _logManager = TestLogManager::instance();
+  _logManager->moveToThread(_logThread);
+  _logThread->start();
 
   _setting = new QSettings(QApplication::applicationDirPath() + "/ConnectionSetting.ini", QSettings::Format::IniFormat, this);
   _setting->setValue("/ConnectionSetting/SettingName","新的配置");
@@ -129,6 +143,8 @@ void MainWindow::setupOtherConnections()
   connect(this, &MainWindow::stopTest, _104Controller, &Iec104Controller::onStopTest, Qt::QueuedConnection);
 
   connect(this, &MainWindow::notifySetTestNumber, _104Controller, &Iec104Controller::updateTestNumber, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::appendTestLogToFile, _logManager, &TestLogManager::addTestLogInFile, Qt::QueuedConnection);
 }
 
 void MainWindow::setupSelfConnections()
@@ -356,90 +372,111 @@ void MainWindow::onMasterReceiveCot20(const QMap<int, bool> relayStatus)
 
 void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int receiveNO, int testNO, int testFailedNO)
 {
-
+  QString logInfo;
   ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [%1]--收到结果: [%2]</span>--失败次数: [%3]").arg(testNO).arg(receiveNO).arg(testFailedNO));
   switch (ioa)
   {
   case 2:
     if (relayStatus[ioa] == newStatus)
     {
+      logInfo = QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 1#relay: expected status: %3 (0: open 1:close)")
+                                                                .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus));
       ui->relayStatusLabel->setText(tr("NO.%1 -- test failed -- 1#relay: expected status: %2").arg(receiveNO).arg(newStatus));
-      ui->TestBrowser->append(QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 1#relay: expected status: %3 (0: open 1:close)")
-                                                                                  .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus)));
+      ui->TestBrowser->append(logInfo);
+
       break;
     }
     if (newStatus)
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 1#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 1#relay: close || old status: open").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 1#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
+
     }
     else
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 1#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 1#relay: open  || old status: close").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 1#relay: open  || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
+
     }
     break;
   case 6:
     if (relayStatus[ioa] == newStatus)
     {
+      logInfo = QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 2#relay: expected status: %3 (0: open 1:close)")
+                                                              .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus));
       ui->relayStatusLabel->setText(tr("NO.%1 -- test failed -- 2#relay: expected status: %2").arg(receiveNO).arg(newStatus));
-      ui->TestBrowser->append(QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 2#relay: expected status: %3 (0: open 1:close)")
-                                                                                    .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus)));
+      ui->TestBrowser->append(logInfo);
+
       break;
     }
     if (newStatus)
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 2#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 2#relay: close || old status: open").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 2#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
+
     }
     else
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 2#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 2#relay: open  || old status: close").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 2#relay: open  || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
+
     }
     break;
   case 10:
     if (relayStatus[ioa] == newStatus)
     {
+      logInfo = QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 3#relay: expected status: %3 (0: open 1:close)")
+                                                              .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus));
       ui->relayStatusLabel->setText(tr("NO.%1 -- test failed -- 3#relay: expected status: %2").arg(receiveNO).arg(newStatus));
-      ui->TestBrowser->append(QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 3#relay: expected status: %3 (0: open 1:close)")
-                                                                                    .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus)));
+      ui->TestBrowser->append(logInfo);
       break;
     }
     if (newStatus)
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 3#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 3#relay: close || old status: open").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 3#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
     }
     else
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 3#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 3#relay: open  || old status: close").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 3#relay: open  || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
     }
     break;
   case 14:
     if (relayStatus[ioa] == newStatus)
     {
+      logInfo = QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 4#relay: expected status: %3 (0: open 1:close)")
+                                                              .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus));
       ui->relayStatusLabel->setText(tr("NO.%1 -- test failed -- 4#relay: expected status: %2").arg(receiveNO).arg(newStatus));
-      ui->TestBrowser->append(QString("<span style='color:red;'>%1</span>").arg(tr("[%1]NO.%2 -- test failed -- 4#relay: expected status: %3 (0: open 1:close)")
-                                                                                    .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(receiveNO).arg(newStatus)));
+      ui->TestBrowser->append(logInfo);
       break;
     }
     if (newStatus)
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 4#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 4#relay: close || old status: open").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 4#relay: close || old status: open").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
     }
     else
     {
+      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 4#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 4#relay: open  || old status: close").arg(receiveNO));
-      ui->TestBrowser->append(QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 4#relay: open  || old status: close").arg(receiveNO));
+      ui->TestBrowser->append(logInfo);
     }
     break;
   default:
     qDebug() << "收到的单点数据非信息对象地址2, 6, 10, 14";
     break;
   }
+
+  emit appendTestLogToFile(logInfo);
+  logInfo.clear();
 
   relayStatus[ioa] = newStatus;
 }
