@@ -83,11 +83,14 @@ private slots:
   void onInterrogationTimerTriggered();
 
   void onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status);
+  void initialRelaysAfterStopTest();
 
 private:
   QMap<int, bool> relayStatus;
   QTimer* _reconnectTimer = nullptr;
   QTimer* _interrogationTimer = nullptr;
+  QTimer* _closeRelayAfterStopTest =nullptr;
+
 
   CS104_Connection _con = nullptr;
 
