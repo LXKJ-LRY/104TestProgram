@@ -145,6 +145,8 @@ void MainWindow::setupOtherConnections()
   connect(this, &MainWindow::notifySetTestNumber, _104Controller, &Iec104Controller::updateTestNumber, Qt::QueuedConnection);
 
   connect(this, &MainWindow::appendTestLogToFile, _logManager, &TestLogManager::addTestLogInFile, Qt::QueuedConnection);
+
+  connect(_104Controller, &Iec104Controller::notifyLogManagerTestStop, _logManager, &TestLogManager::onTestStop, Qt::QueuedConnection);
 }
 
 void MainWindow::setupSelfConnections()

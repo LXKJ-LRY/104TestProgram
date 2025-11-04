@@ -575,6 +575,8 @@ void IEC104Master::stopTestTo10000(int ioa)
 
   initialRelaysAfterStopTest();
 
+  emit haveStopedTest();
+
 }
 
 void IEC104Master::setNewTestNumber(int newTestNumber)

@@ -81,6 +81,8 @@ signals:
 
   void initialTestRelay();
 
+  void haveStopedTest();
+
 
 private slots:
   void onReconnectTimerTriggered();

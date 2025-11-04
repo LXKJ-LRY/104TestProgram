@@ -27,6 +27,8 @@ signals:
 
   void updateTestNumber(int defaultNumber);
 
+  void notifyLogManagerTestStop();
+
 public slots:
   void onConnection(QString localAddr, int localPort, QString remoteAddr, int remotePort);
   void onDisConnection();

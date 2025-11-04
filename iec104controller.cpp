@@ -23,6 +23,7 @@ Iec104Controller::Iec104Controller(QObject *parent)
   connect(master, &IEC104Master::connectionClosed, this, &Iec104Controller::masterConnectionClosed);
   connect(master, &IEC104Master::receiveCot20, this, &Iec104Controller::masterReceiveCot20);
   connect(master, &IEC104Master::receiveSinglePointStatus, this, &Iec104Controller::masterReceiveSinglePointStatus);
+  connect(master, &IEC104Master::haveStopedTest, this, &Iec104Controller::notifyLogManagerTestStop);
 }
 
 Iec104Controller::~Iec104Controller()

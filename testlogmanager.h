@@ -16,6 +16,8 @@ public:
   void release();
 
   void addTestLogInFile(QString newLog);
+
+  void onTestStop();
 signals:
 
 

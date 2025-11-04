@@ -107,3 +107,13 @@ void TestLogManager::addTestLogInFile(QString newLog)
     appendLogs.flush();
   }
 }
+
+void TestLogManager::onTestStop()
+{
+  if (_logFile->exists() && _logFile->isOpen())
+  {
+    QTextStream stopTestLog(_logFile);
+    stopTestLog << "\n\n";
+    stopTestLog.flush();
+  }
+}
