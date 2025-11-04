@@ -472,10 +472,13 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
     {
       if (_isUnderTest.load() || receivceSingleNO != testNO)
       {
+        oldTestNO = receivceSingleNO;
+        if (singleTestTwice == 0)
+        {
+          receivceSingleNO++;
+        }
 
-        receivceSingleNO++;
-
-        if (relayStatus[singleIOA] == newStatus)
+        if (relayStatus[singleIOA] == newStatus && oldTestNO != receivceSingleNO)
         {
           testFailedNO++;
         }
@@ -487,10 +490,10 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
 
       //emit receiveSinglePointStatus(singleIOA, newStatus, receivceSingleNO, testNO, testFailedNO);
       relayStatus[singleIOA] = newStatus;
-      if (_isUnderTest.load())
-      {
-        emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, newStatus);
-      }
+      // if (_isUnderTest.load())
+      // {
+      emit underTestReceiveSinglePoint(receivceSingleNO, singleIOA, newStatus);
+      // }
     }
     else if (_isInitializeAfterStop.load())
     {
@@ -582,7 +585,7 @@ void IEC104Master::setNewTestNumber(int newTestNumber)
 
 void IEC104Master::testTo10000(int testIoa, int receiveIoa)
 {
-  if (testNO == testNumber.load())
+  if (testNO >= testNumber.load() && singleTestTwice == 0)
   {
     testNO = 0;
     receivceSingleNO = 0;
@@ -590,7 +593,10 @@ void IEC104Master::testTo10000(int testIoa, int receiveIoa)
     return;
   }
 
-  testNO++;
+  if (singleTestTwice == 0)
+  {
+    testNO++;
+  }
   qDebug() << "--------testNO: " << testNO;
   if (sendTestYK(testIoa, !relayStatus[receiveIoa]))
   {
@@ -607,6 +613,9 @@ void IEC104Master::testTo10000(int testIoa, int receiveIoa)
 
 void IEC104Master::onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool status)
 {
+  singleTestTwice++;
+  if (singleTestTwice == 2) singleTestTwice = 0;
+
   QThread::msleep(100);
   if (_isUnderTest.load())
   {
@@ -616,14 +625,21 @@ void IEC104Master::onUnderTestReceiveSinglePoint(int receiveNO, int ioa, bool st
 
 void IEC104Master::initialRelaysAfterStopTest()
 {
-  sendChoosedYKOpen(closedRelayIOA);
-
+  if (closedRelayIOA != -1)
+  {
+    sendChoosedYKOpen(closedRelayIOA);
+  }
+  else
+  {
+    initialTestRelayAfterStop();
+  }
   // sendInterrogation();
 }
 
 void IEC104Master::initialTestRelayAfterStop()
 {
   sendChoosedYKOpen(testIOA);
+  _isInitializeAfterStop.store(false);
   _closeRelayAfterStopTest->start();
 }
 
