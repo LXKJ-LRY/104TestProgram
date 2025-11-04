@@ -21,6 +21,7 @@ class IEC104Master : public QObject
   Q_OBJECT
 public:
   explicit IEC104Master(QObject *parent = nullptr);
+  ~IEC104Master();
 
   void start(QString localAddr, int localPort, QString remoteAddr, int remotePort);
   bool stop();
@@ -46,6 +47,8 @@ public:
   void stopTestTo10000(int ioa);
 
   void setNewTestNumber(int newTestNumber);
+
+  void onClearTestCount();
 
 private:
   void setupTimers();

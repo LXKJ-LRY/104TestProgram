@@ -19,6 +19,39 @@ IEC104Master::IEC104Master(QObject *parent)
   setupTimers();
 }
 
+IEC104Master::~IEC104Master()
+{
+  if (_reconnectTimer)
+  {
+    if (_reconnectTimer->isActive())
+    {
+      _reconnectTimer->stop();
+    }
+    delete _reconnectTimer;
+    _reconnectTimer = nullptr;
+  }
+
+  if (_interrogationTimer)
+  {
+    if (_interrogationTimer->isActive())
+    {
+      _interrogationTimer->stop();
+    }
+    delete _interrogationTimer;
+    _interrogationTimer = nullptr;
+  }
+
+  if (_closeRelayAfterStopTest)
+  {
+    if (_closeRelayAfterStopTest->isActive())
+    {
+      _closeRelayAfterStopTest->stop();
+    }
+    delete _closeRelayAfterStopTest;
+    _closeRelayAfterStopTest = nullptr;
+  }
+}
+
 void IEC104Master::setupTimers()
 {
   _reconnectTimer = new QTimer(this);
@@ -468,6 +501,8 @@ void IEC104Master::handleRecvRequestUpdateDeviceStatus(CS101_ASDU asdu)
     int singleIOA = InformationObject_getObjectAddress(object);
     bool newStatus = SinglePointInformation_getValue((SinglePointInformation) object);
 
+    if (singleIOA == 4 || singleIOA == 8 || singleIOA == 12 || singleIOA == 16) return;
+
     if (_isUnderTest.load())
     {
       if (_isUnderTest.load() || receivceSingleNO != testNO)
@@ -582,6 +617,13 @@ void IEC104Master::stopTestTo10000(int ioa)
 void IEC104Master::setNewTestNumber(int newTestNumber)
 {
   testNumber.store(newTestNumber);
+}
+
+void IEC104Master::onClearTestCount()
+{
+  testNO = 0;
+  receivceSingleNO = 0;
+  singleTestTwice = 0;
 }
 
 

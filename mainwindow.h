@@ -60,6 +60,8 @@ signals:
 
   void appendTestLogToFile(QString text);
 
+  void clearTestHistoryCount();
+
 private slots:
   void onSettingPageButtonClicked();
   void onTestPageButtonClicked();

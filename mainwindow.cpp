@@ -147,6 +147,8 @@ void MainWindow::setupOtherConnections()
   connect(this, &MainWindow::appendTestLogToFile, _logManager, &TestLogManager::addTestLogInFile, Qt::QueuedConnection);
 
   connect(_104Controller, &Iec104Controller::notifyLogManagerTestStop, _logManager, &TestLogManager::onTestStop, Qt::QueuedConnection);
+
+  connect(this, &MainWindow::clearTestHistoryCount, _104Controller, &Iec104Controller::setTestCountToZero, Qt::QueuedConnection);
 }
 
 void MainWindow::setupSelfConnections()
@@ -197,6 +199,8 @@ void MainWindow::onTestPageButtonClicked()
 void MainWindow::onClearTestInfoButtonClicked()
 {
   ui->TestBrowser->clear();
+  ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [0]--收到结果: [0]</span>--失败次数: [0]"));
+  emit clearTestHistoryCount();
 }
 
 void MainWindow::onNewSettingButtonClicked()
@@ -390,14 +394,16 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int r
     }
     if (newStatus)
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 1#relay: close || old status: open").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 1#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 1#relay: close || old status: open").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
 
     }
     else
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 1#relay: open  || old status: close").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 1#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 1#relay: open  || old status: close").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
 
@@ -415,14 +421,16 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int r
     }
     if (newStatus)
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 2#relay: close || old status: open").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 2#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 2#relay: close || old status: open").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
 
     }
     else
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 2#relay: open  || old status: close").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 2#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 2#relay: open  || old status: close").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
 
@@ -439,13 +447,15 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int r
     }
     if (newStatus)
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 3#relay: close || old status: open").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 3#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 3#relay: close || old status: open").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
     }
     else
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 3#relay: open  || old status: close").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 3#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 3#relay: open  || old status: close").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
     }
@@ -461,13 +471,15 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int r
     }
     if (newStatus)
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 4#relay: close || old status: open").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 4#relay: close || old status: open").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 4#relay: close || old status: open").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
     }
     else
     {
-      logInfo = QString("[%1]").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + tr("NO.%1 - 4#relay: open  || old status: close").arg(receiveNO);
+      logInfo = QString("<span style='color:black;'>%1</span>").arg("[" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) + "]"
+                                                                    + tr("NO.%1 - 4#relay: open  || old status: close").arg(receiveNO);
       ui->relayStatusLabel->setText(tr("NO.%1 - 4#relay: open  || old status: close").arg(receiveNO));
       ui->TestBrowser->append(logInfo);
     }

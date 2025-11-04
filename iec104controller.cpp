@@ -18,12 +18,14 @@ Iec104Controller::Iec104Controller(QObject *parent)
   qRegisterMetaType<QMap<int, bool>>("QMap<int,bool>");
 
   connect(this, &Iec104Controller::updateTestNumber, master, &IEC104Master::setNewTestNumber);
+  connect(this, &Iec104Controller::setTestCountToZero, master, &IEC104Master::onClearTestCount);
 
   connect(master, &IEC104Master::connectionEstablished, this, &Iec104Controller::masterEstablishConnection);
   connect(master, &IEC104Master::connectionClosed, this, &Iec104Controller::masterConnectionClosed);
   connect(master, &IEC104Master::receiveCot20, this, &Iec104Controller::masterReceiveCot20);
   connect(master, &IEC104Master::receiveSinglePointStatus, this, &Iec104Controller::masterReceiveSinglePointStatus);
   connect(master, &IEC104Master::haveStopedTest, this, &Iec104Controller::notifyLogManagerTestStop);
+
 }
 
 Iec104Controller::~Iec104Controller()
