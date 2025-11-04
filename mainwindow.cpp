@@ -2,7 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "memory"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent)   // there will be some error when merge into origin/main
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
