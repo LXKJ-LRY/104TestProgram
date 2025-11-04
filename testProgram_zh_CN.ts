@@ -208,7 +208,7 @@
     <message>
         <location filename="mainwindow.cpp" line="314"/>
         <source>no settings</source>
-        <translation>暂无相关地址设置：\n尝试连接前请先新增网络配置</translation>
+        <translation>暂无相关地址设置：尝试连接前请先新增网络配置</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="331"/>

@@ -124,6 +124,9 @@ private:
   int testIOA = -1;
   int receiveIOA = -1;
 
+  int singleTestTwice = 0;
+  int oldTestNO = 0;
+
   std::atomic_int testNumber;
 
 };
