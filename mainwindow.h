@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include "dbdatahandler.h"
+#include "settingManager/settingmanager.h"
 #include "iec104controller.h"
-#include "testlogmanager.h"
+#include "devicepointdialog.h"
 
 #include <QMainWindow>
 #include <QSettings>
@@ -15,7 +16,6 @@
 #include <QValidator>
 #include <QMetaType>
 #include <QMap>
-#include <QDateTime>
 
 
 QT_BEGIN_NAMESPACE
@@ -56,14 +56,10 @@ signals:
   void startTest(int ioa);
   void stopTest(int ioa);
 
-  void notifySetTestNumber(int defaultNumber = 10000);
-
-  void appendTestLogToFile(QString text);
-
 private slots:
   void onSettingPageButtonClicked();
   void onTestPageButtonClicked();
-  void onClearTestInfoButtonClicked();
+  void onDeviceListButtonClicked();
 
   void onSettingComboBoxchanged(int index);
 
@@ -100,8 +96,6 @@ private slots:
   void onStartTestButtonClicked();
   void onStopTestButtonClicked();
 
-  void onTestNumberEditCommitted();
-
 private:
   void initialize();
   void initialEdits();
@@ -113,8 +107,7 @@ private:
   Ui::MainWindow *ui;
   QSettings* _setting;
 
-  TestLogManager* _logManager = nullptr;
-  QThread* _logThread = nullptr;
+  SettingManager* _settingManager;
 
   DBDataHandler* _dbDataHandler = nullptr;
   QThread* _dbThread = nullptr;
@@ -124,7 +117,6 @@ private:
 
   QValidator* _ipValidator = nullptr;
   QValidator* _portValidator = nullptr;
-  QValidator* _testNumberValidator = nullptr;
 
   QMap<int, bool> relayStatus;
 
