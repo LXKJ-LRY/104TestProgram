@@ -234,100 +234,100 @@
         <translation>地址或端口不可为空</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="390"/>
+        <location filename="mainwindow.cpp" line="391"/>
         <source>NO.%1 -- test failed -- 1#relay: expected status: %2</source>
         <translation>第【%1】次测试：失败！（1#继电器预期状态：%2）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="388"/>
+        <location filename="mainwindow.cpp" line="389"/>
         <source>[%1]NO.%2 -- test failed -- 1#relay: expected status: %3 (0: open 1:close)</source>
         <translation>[%1]第【%2】次测试：1#继电器切换状态失败！-- 预期状态：%3 （0：分 1：合）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="398"/>
         <location filename="mainwindow.cpp" line="399"/>
+        <location filename="mainwindow.cpp" line="400"/>
         <source>NO.%1 - 1#relay: close || old status: open</source>
         <translation>第【%1】次测试：1#继电器状态：合 || 此前状态：分</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="406"/>
         <location filename="mainwindow.cpp" line="407"/>
+        <location filename="mainwindow.cpp" line="408"/>
         <source>NO.%1 - 1#relay: open  || old status: close</source>
         <translation>第【%1】次测试：1#继电器状态：分 || 此前状态：合</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="417"/>
+        <location filename="mainwindow.cpp" line="418"/>
         <source>NO.%1 -- test failed -- 2#relay: expected status: %2</source>
         <translation>第【%1】次测试：失败！（2#继电器预期状态：%2）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="415"/>
+        <location filename="mainwindow.cpp" line="416"/>
         <source>[%1]NO.%2 -- test failed -- 2#relay: expected status: %3 (0: open 1:close)</source>
         <translation>[%1]第【%2】次测试：2#继电器切换状态失败！-- 预期状态：%3 （0：分 1：合）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="425"/>
         <location filename="mainwindow.cpp" line="426"/>
+        <location filename="mainwindow.cpp" line="427"/>
         <source>NO.%1 - 2#relay: close || old status: open</source>
         <translation>第【%1】次测试：2#继电器状态：合 || 此前状态：分</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="433"/>
         <location filename="mainwindow.cpp" line="434"/>
+        <location filename="mainwindow.cpp" line="435"/>
         <source>NO.%1 - 2#relay: open  || old status: close</source>
         <translation>第【%1】次测试：2#继电器状态：分 || 此前状态：合</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="444"/>
+        <location filename="mainwindow.cpp" line="445"/>
         <source>NO.%1 -- test failed -- 3#relay: expected status: %2</source>
         <translation>第【%1】次测试：失败！（3#继电器预期状态：%2）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="442"/>
+        <location filename="mainwindow.cpp" line="443"/>
         <source>[%1]NO.%2 -- test failed -- 3#relay: expected status: %3 (0: open 1:close)</source>
         <translation>[%1]第【%2】次测试：3#继电器切换状态失败！-- 预期状态：%3 （0：分 1：合）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="451"/>
         <location filename="mainwindow.cpp" line="452"/>
+        <location filename="mainwindow.cpp" line="453"/>
         <source>NO.%1 - 3#relay: close || old status: open</source>
         <translation>第【%1】次测试：3#继电器状态：合 || 此前状态：分</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="458"/>
         <location filename="mainwindow.cpp" line="459"/>
+        <location filename="mainwindow.cpp" line="460"/>
         <source>NO.%1 - 3#relay: open  || old status: close</source>
         <translation>第【%1】次测试：3#继电器状态：分 || 此前状态：合</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="468"/>
+        <location filename="mainwindow.cpp" line="469"/>
         <source>NO.%1 -- test failed -- 4#relay: expected status: %2</source>
         <translation>第【%1】次测试：失败！（4#继电器预期状态：%2）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="466"/>
+        <location filename="mainwindow.cpp" line="467"/>
         <source>[%1]NO.%2 -- test failed -- 4#relay: expected status: %3 (0: open 1:close)</source>
         <translation>[%1]第【%2】次测试：4#继电器切换状态失败！-- 预期状态：%3 （0：分 1：合）</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="475"/>
         <location filename="mainwindow.cpp" line="476"/>
+        <location filename="mainwindow.cpp" line="477"/>
         <source>NO.%1 - 4#relay: close || old status: open</source>
         <translation>第【%1】次测试：4#继电器状态：合 || 此前状态：分</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="482"/>
         <location filename="mainwindow.cpp" line="483"/>
+        <location filename="mainwindow.cpp" line="484"/>
         <source>NO.%1 - 4#relay: open  || old status: close</source>
         <translation>第【%1】次测试：4#继电器状态：分 || 此前状态：合</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="647"/>
+        <location filename="mainwindow.cpp" line="648"/>
         <source>Invalid Number</source>
         <translation>无效的测试次数</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="647"/>
+        <location filename="mainwindow.cpp" line="648"/>
         <source>Set the test number as default</source>
         <translation>已将测试次数设置为默认值</translation>
     </message>
