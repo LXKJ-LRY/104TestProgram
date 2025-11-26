@@ -90,7 +90,6 @@ target_link_libraries(testProgram PRIVATE lib60870)
 
 if(UNIX)
     target_link_libraries(testProgram PRIVATE Threads::Threads)
-target_link_libraries(testProgram PRIVATE Qt5::Core)
 endif()
 
 add_custom_target(translations ALL

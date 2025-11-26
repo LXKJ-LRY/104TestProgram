@@ -2,19 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
-    <name>DevicePointDialog</name>
-    <message>
-        <location filename="build/testProgram_autogen/include/ui_devicepointdialog.h" line="40"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="build/testProgram_autogen/include/ui_devicepointdialog.h" line="41"/>
-        <source>PushButton</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>

@@ -6,8 +6,7 @@ void Iec104Controller::release()
 {
   if (_104controller != nullptr)
   {
-    delete _104controller;
-    _104controller = nullptr;
+    _104controller->deleteLater();
   }
 }
 
