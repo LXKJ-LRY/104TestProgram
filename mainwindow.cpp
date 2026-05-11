@@ -199,7 +199,7 @@ void MainWindow::onTestPageButtonClicked()
 void MainWindow::onClearTestInfoButtonClicked()
 {
   ui->TestBrowser->clear();
-  ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [0]--收到结果: [0]</span>--失败次数: [0]"));
+  ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [0]--收到结果: [0]</span>--失败次数: [0]--<span style='color:black'>成功率: [X]%</span>"));
   emit clearTestHistoryCount();
 }
 
@@ -379,8 +379,8 @@ void MainWindow::onMasterReceiveCot20(const QMap<int, bool> relayStatus)
 void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int receiveNO, int testNO, int testFailedNO)
 {
   QString logInfo;
-  ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [%1]--收到结果: [%2]</span>--失败次数: [%3]")
-                                        .arg(testNO).arg(receiveNO).arg(testFailedNO));
+  ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [%1]--收到结果: [%2]</span>--失败次数: [%3]--<span style='color:black'>Success rate: [%4]%</span>")
+                                    .arg(testNO).arg(receiveNO).arg(testFailedNO).arg((float(testNO-testFailedNO)/testNO)*100));
   switch (ioa)
   {
   case 2:
