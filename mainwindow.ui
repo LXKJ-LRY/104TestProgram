@@ -247,17 +247,17 @@ color: rgb(255, 0, 0);
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="relayStatusLabel">
+         <widget class="QLabel" name="testCounterLabel">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>30</pointsize>
            </font>
           </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(255, 0, 0);</string>
           </property>
           <property name="text">
-           <string>设备状态</string>
+           <string>测试计数</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -274,18 +274,28 @@ color: rgb(255, 0, 0);
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="font">
+             <font>
+              <pointsize>20</pointsize>
+             </font>
+            </property>
             <property name="text">
-             <string>测试次数：</string>
+             <string>目标测试次数：</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLineEdit" name="testNumberEdit">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>20</pointsize>
+             </font>
             </property>
            </widget>
           </item>
@@ -306,15 +316,20 @@ color: rgb(255, 0, 0);
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="testCounterLabel">
+           <widget class="QLabel" name="relayStatusLabel">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
             <property name="styleSheet">
              <string notr="true">color: rgb(255, 0, 0);</string>
             </property>
             <property name="text">
-             <string>测试计数</string>
+             <string>设备状态</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>

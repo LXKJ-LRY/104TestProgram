@@ -379,7 +379,7 @@ void MainWindow::onMasterReceiveCot20(const QMap<int, bool> relayStatus)
 void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int receiveNO, int testNO, int testFailedNO)
 {
   QString logInfo;
-  ui->testCounterLabel->setText(QString("<span style='color:black'>测试次数: [%1]--收到结果: [%2]</span>--失败次数: [%3]--<span style='color:black'>Success rate: [%4]%</span>")
+  ui->testCounterLabel->setText(QString("<span style='color:black'>已发出累计数: [%1]--完成次数: [%2]</span>--失败次数: [%3]--<span style='color:green'>成功率为: [%4]%</span>")
                                     .arg(testNO).arg(receiveNO).arg(testFailedNO).arg((float(testNO-testFailedNO)/testNO)*100));
   switch (ioa)
   {
@@ -629,11 +629,13 @@ void MainWindow::onTest4CheckBoxClicked()
 void MainWindow::onStartTestButtonClicked()
 {
   emit startTest(TestIOA);
+  ui->testNumberEdit->setEnabled(false);
 }
 
 void MainWindow::onStopTestButtonClicked()
 {
   emit stopTest(TestIOA);
+  ui->testNumberEdit->setEnabled(true);
 }
 
 void MainWindow::onTestNumberEditCommitted()
