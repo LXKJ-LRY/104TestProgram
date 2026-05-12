@@ -17,7 +17,7 @@ public:
 
   void addTestLogInFile(QString newLog);
 
-  void onTestStop();
+  void onTestStop(int testNO, int receivedNO, int testFailedNO);
 signals:
 
 

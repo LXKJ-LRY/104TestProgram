@@ -108,10 +108,12 @@ void TestLogManager::addTestLogInFile(QString newLog)
   }
 }
 
-void TestLogManager::onTestStop()
+void TestLogManager::onTestStop(int testNO, int receivedNO, int testFailedNO)
 {
   if (_logFile->exists() && _logFile->isOpen())
   {
+    auto rateLog = tr("[%1]this test success rate is : [%2]%").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(((float)testNO - (float)testFailedNO)*100 / (float)testNO);
+    addTestLogInFile(rateLog);
     QTextStream stopTestLog(_logFile);
     stopTestLog << "\n\n";
     stopTestLog.flush();

@@ -380,7 +380,7 @@ void MainWindow::onMasterReceiveSinglePointStatus(int ioa, bool newStatus, int r
 {
   QString logInfo;
   ui->testCounterLabel->setText(QString("<span style='color:black'>已发出累计数: [%1]--完成次数: [%2]</span>--失败次数: [%3]--<span style='color:green'>成功率为: [%4]%</span>")
-                                    .arg(testNO).arg(receiveNO).arg(testFailedNO).arg((float(testNO-testFailedNO)/testNO)*100));
+                                    .arg(testNO).arg(receiveNO).arg(testFailedNO).arg((float(testNO-testFailedNO)/(float)testNO)*100));
   switch (ioa)
   {
   case 2:

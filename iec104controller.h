@@ -27,7 +27,7 @@ signals:
 
   void updateTestNumber(int defaultNumber);
 
-  void notifyLogManagerTestStop();
+  void notifyLogManagerTestStop(int testNO, int receivedNO, int testFailedNO);
 
   void setTestCountToZero();
 

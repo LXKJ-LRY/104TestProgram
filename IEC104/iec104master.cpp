@@ -562,13 +562,13 @@ void IEC104Master::startTestTo10000(int ioa)
 {
   if (_isUnderTest.load() || ioa == -1) return;
 
-  if(testIOA != ioa)
-  {
-    qDebug() << "切换了测试继电器";
-    testNO = 0;
-    receivceSingleNO = 0;
-    testFailedNO = 0;
-  }
+  // if(testIOA != ioa)
+  // {
+  qDebug() << tr("Start a new test");
+  testNO = 0;
+  receivceSingleNO = 0;
+  testFailedNO = 0;
+  // }
 
   testIOA = ioa;
   switch(ioa)
@@ -610,7 +610,7 @@ void IEC104Master::stopTestTo10000(int ioa)
 
   initialRelaysAfterStopTest();
 
-  emit haveStopedTest();
+  emit haveStopedTest(testNO, receivceSingleNO, testFailedNO);
 
 }
 

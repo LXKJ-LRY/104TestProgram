@@ -84,7 +84,7 @@ signals:
 
   void initialTestRelay();
 
-  void haveStopedTest();
+  void haveStopedTest(int testNO = 10000, int receivedNO = 0, int testFailedNO = 0);
 
 
 private slots:
